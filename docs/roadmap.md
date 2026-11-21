@@ -40,6 +40,12 @@ Also in 1.1, from testing 1.0.0 on a clean PC:
 - **An Open button on the no-file page**, beside "Open a Markdown file to preview it", plus a
   line saying a file can be dropped there. The page only asks for the Open dialog; the user
   picks the file.
+- **Opt in to beta updates** (#48). A **Get beta versions** option in the **⋯** menu, off by
+  default; with it on, the update check also offers pre-releases (`x.y.z-beta.n`), newest first,
+  with the same hash check and install rules as stable updates. Turning it off never downgrades.
+  Changes "How the update check decides" (`decisions.md`), which reads only
+  `releases/latest`; record the new choice there. Copies older than 1.1 can't see betas, so the first one is downloaded by
+  hand.
 
 If it fits (otherwise a later release):
 
