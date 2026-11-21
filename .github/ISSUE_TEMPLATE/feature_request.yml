@@ -1,6 +1,6 @@
 name: Feature request
 description: Suggest an improvement to MDGlint.
-labels: ["enhancement"]
+labels: ["enhancement", "needs-triage"]
 body:
   - type: markdown
     attributes:

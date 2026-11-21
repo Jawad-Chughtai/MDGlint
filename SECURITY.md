@@ -71,8 +71,9 @@ None at the moment. Known issues are listed here until they are fixed.
   (`gh attestation verify MDGlintSetup.exe -R Jawad-Chughtai/MDGlint`). A published release
   can't be changed afterwards: its files and tag are immutable. MDGlint itself checks the
   SHA-256, not the attestation.
-- The test hooks that send update requests to a local server, move MDGlint's data folders or
-  log programs instead of starting them exist only in Debug builds, which are never released.
+- The test hooks that send update requests to a local server, move MDGlint's data folders,
+  log programs instead of starting them or pass extra browser arguments to WebView2 (such as a
+  DevTools port) exist only in Debug builds, which are never released.
   An installed MDGlint ignores those environment variables.
 
 Each of these is checked by automated tests on every change, most of them in the real app:

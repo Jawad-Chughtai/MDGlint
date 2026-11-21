@@ -8,7 +8,7 @@ MDGlint tracks work in **GitHub Issues** on the public repository
 | What | Where |
 |---|---|
 | Bugs, features, tasks | GitHub Issues |
-| Release plan | Milestones, one per release (`1.0.0`, `1.1 Export`, ...) |
+| Release plan | Milestones, one per release after 1.0.0 (`1.1 Export, print and copy`, ...) |
 | High-level plan and order | `docs/roadmap.md`, linking each release to its milestone |
 | Board view (optional) | A GitHub Project with columns Backlog, In progress, Review, Done |
 | Security reports | Private security advisories only, never public issues (`SECURITY.md`) |
@@ -26,9 +26,12 @@ without a milestone.
 - **Status**: `needs-triage` (new, unreviewed), `needs-info` (waiting on the
   reporter), `wontfix`, `duplicate`.
 - **Contributors**: `good first issue`, `help wanted`.
+- **Dependabot**: `dependencies`, plus `.NET` or `github_actions`, on its
+  update PRs.
 
-The issue forms apply `bug` or `enhancement` automatically; the maintainer
-adds area, milestone and status during triage.
+The issue forms apply `bug` or `enhancement`, and `needs-triage`,
+automatically; the maintainer adds area and milestone during triage and
+removes `needs-triage`.
 
 ## Workflow
 
@@ -39,7 +42,8 @@ adds area, milestone and status during triage.
 3. The pull request says `Fixes #12` so merging closes the issue and links
    the commit.
 4. User-visible changes get a `CHANGELOG.md` entry in the same PR.
-5. A release is cut when its milestone is closed (`releasing.md`).
+5. A release is cut when its milestone's issues are done, and the milestone
+   is closed once the release is published (`releasing.md`).
 
 Commit messages and PRs carry no AI attribution and no personal information
 (`AGENTS.md`).
