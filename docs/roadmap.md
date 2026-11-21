@@ -17,39 +17,39 @@ not tied to a release are issues without a milestone. When a release ships, move
 
 Milestone: [1.1 Export, print and copy](https://github.com/Jawad-Chughtai/MDGlint/milestone/1)
 
-- **HTML**: a self-contained `.html` file with the current theme's styles inlined.
-- **PDF**: via WebView2's built-in print-to-PDF, with a light theme option for printing.
-- **DOCX**: Markdown to Word with headings, lists, tables, code and images. Needs a library
+- **HTML** (#11): a self-contained `.html` file with the current theme's styles inlined.
+- **PDF** (#12): via WebView2's built-in print-to-PDF, with a light theme option for printing.
+- **DOCX** (#13): Markdown to Word with headings, lists, tables, code and images. Needs a library
   choice (for example the Open XML SDK, MIT) recorded in `decisions.md`.
-- Print (the system print dialog).
-- **Copy**: a copy button on each code block, and a command that copies the whole file's
+- Print, through the system print dialog (#14).
+- **Copy** (#15): a copy button on each code block, and a command that copies the whole file's
   Markdown.
 
-Also in 1.1, from testing 1.0.0 on a clean PC:
+Also in 1.1 (the first three come from testing 1.0.0 on a clean PC):
 
-- **Reopen the file after an update.** Setup reopens MDGlint without the file that was open.
+- **Reopen the file after an update** (#16). Setup reopens MDGlint without the file that was open.
   Before starting setup, MDGlint notes the open file in `%LOCALAPPDATA%\MDGlint`; the next
   start with no file opens it if the note is a few minutes old, then deletes it. Setup doesn't
   change. Works for updates started from 1.1 on.
-- **Download updates in the background.** With update checks on, a found update downloads and is
+- **Download updates in the background** (#17). With update checks on, a found update downloads and is
   verified without a click; the bar says it installs when MDGlint closes and offers **Restart
   now**. Closing runs setup silently without reopening. All-users installs need administrator
   rights, so they keep the **Install** button (download only in the background). With checks off,
   nothing changes. Changes "it installs only when the user presses **Install**" (`decisions.md`,
   "Update checks are opt-in"); record the new choice there.
-- **An Open button on the no-file page**, beside "Open a Markdown file to preview it", plus a
+- **An Open button on the no-file page** (#18), beside "Open a Markdown file to preview it", plus a
   line saying a file can be dropped there. The page only asks for the Open dialog; the user
   picks the file.
 - **Opt in to beta updates** (#48). A **Get beta versions** option in the **⋯** menu, off by
   default; with it on, the update check also offers pre-releases (`x.y.z-beta.n`), newest first,
   with the same hash check and install rules as stable updates. Turning it off never downgrades.
   Changes "How the update check decides" (`decisions.md`), which reads only
-  `releases/latest`; record the new choice there. Copies older than 1.1 can't see betas, so the first one is downloaded by
-  hand.
+  `releases/latest`; record the new choice there. Copies older than 1.1 can't see betas, so
+  the first one is downloaded by hand.
 
 If it fits (otherwise a later release):
 
-- **App design**: a redesigned toolbar and overall look, possibly with a status bar at the
+- **App design** (#19): a redesigned toolbar and overall look, possibly with a status bar at the
   bottom.
 
 ## 1.2 — Quick inline edits
@@ -58,19 +58,19 @@ Milestone: [1.2 Quick inline edits](https://github.com/Jawad-Chughtai/MDGlint/mi
 
 Fix a typo or change a couple of lines without switching apps.
 
-- Toggle an edit mode (or a source pane beside the preview) for the open file.
-- Save back to the same file with the original encoding and line endings preserved; warn if the
+- Toggle an edit mode (#20) (or a source pane beside the preview) for the open file.
+- Save back to the same file (#21) with the original encoding and line endings preserved; warn if the
   file changed on disk meanwhile.
-- Undo, and a clear unsaved-changes indicator and prompt on close.
+- Undo (#22), and a clear unsaved-changes indicator and prompt on close.
 
 ## 1.3 — Diagrams and rich content
 
 Milestone: [1.3 Diagrams and rich content](https://github.com/Jawad-Chughtai/MDGlint/milestone/3)
 
-- **Mermaid** diagrams (flowcharts, sequence, class, state, Gantt) rendered from ```` ```mermaid ````
+- **Mermaid** diagrams (#23) (flowcharts, sequence, class, state, Gantt) rendered from ```` ```mermaid ````
   blocks, following the light or dark theme.
-- Math (KaTeX or MathJax), if it fits the size budget.
-- Emoji shortcodes (`:tada:`). GitHub-style alerts already render since 1.0.0.
+- Math (#24), with KaTeX or MathJax, if it fits the size budget.
+- Emoji shortcodes such as `:tada:` (#25). GitHub-style alerts already render since 1.0.0.
 
 Diagram and math libraries must be bundled (no CDN), so previews work offline and stay within the
 security model.
@@ -79,30 +79,30 @@ security model.
 
 Milestone: [1.4 Navigation](https://github.com/Jawad-Chughtai/MDGlint/milestone/4)
 
-- **Outline sidebar** built from the headings, with click-to-jump and the current section
+- **Outline sidebar** (#26) built from the headings, with click-to-jump and the current section
   highlighted.
-- **Find in page** (Ctrl+F) with match count and next/previous.
-- **Recent files** list (stored locally, clearable).
-- A proper menu or command bar for the growing set of actions, with keyboard shortcuts.
+- **Find in page** (#27), Ctrl+F, with match count and next/previous.
+- **Recent files** list (#28), stored locally and clearable.
+- A proper menu or command bar (#29) for the growing set of actions, with keyboard shortcuts.
 
 ## 1.5 — Tabs
 
 Milestone: [1.5 Tabs](https://github.com/Jawad-Chughtai/MDGlint/milestone/5)
 
-- **Multiple files in tabs**, each with its own scroll position and file watcher.
-- Drag and drop opens in a new tab; double-clicking another file while MDGlint is open adds a
+- **Multiple files in tabs** (#30), each with its own scroll position and file watcher.
+- Single instance (#31): drag and drop opens in a new tab; double-clicking another file while MDGlint is open adds a
   tab to the running window instead of starting a second one (single instance).
-- Restore open tabs on next launch (optional).
+- Restore open tabs on next launch, optionally (#32).
 
 ## Exploring
 
 Ideas not yet committed to a release.
 
-- **Mac and Linux, possibly with Electron.** Kept open, not planned: Electron (MIT) would bring
+- **Mac and Linux, possibly with Electron** (#38). Kept open, not planned: Electron (MIT) would bring
   other platforms and remove the WebView2 licence terms, but means rewriting the app around a
   bundled Chromium that MDGlint itself must keep patched, plus a larger, slower app (decision
   log).
-- **Quick peek at other file types**: plain text, JSON, YAML, CSV as a table, source code with
+- **Quick peek at other file types** (#39): plain text, JSON, YAML, CSV as a table, source code with
   highlighting. Decide whether this fits once tabs exist.
 
 ## Ongoing tracks
