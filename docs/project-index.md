@@ -33,7 +33,6 @@ Where things live. Keep this current when files are added, moved, or removed.
 | `docs/architecture.md` | Projects, rendering flow, runtime data locations |
 | `docs/decisions.md` | Decision log with reasons |
 | `docs/roadmap.md` | Planned releases in priority order |
-| `docs/backlog.md` | Known gaps, with details |
 | `docs/issue-tracking.md` | GitHub Issues: labels, milestones, workflow, agent permissions |
 | `docs/releasing.md` | Steps to cut a release |
 | `docs/images/` | README screenshots, and `sample.md`, the document they show |

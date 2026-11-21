@@ -7,14 +7,15 @@ MDGlint tracks work in **GitHub Issues** on the public repository
 
 | What | Where |
 |---|---|
-| Bugs, features, tasks | GitHub Issues (canonical once the public repo exists) |
+| Bugs, features, tasks | GitHub Issues |
 | Release plan | Milestones, one per release (`1.0.0`, `1.1 Export`, ...) |
 | High-level plan and order | `docs/roadmap.md`, linking each release to its milestone |
 | Board view (optional) | A GitHub Project with columns Backlog, In progress, Review, Done |
 | Security reports | Private security advisories only, never public issues (`SECURITY.md`) |
 
-After migration, `backlog.md` is retired: its entries become issues and the
-file is deleted, so the same list is never kept in two places.
+The old `backlog.md` is retired: its entries are now issues, so the same list
+is never kept in two places. Known gaps not tied to a release are issues
+without a milestone.
 
 ## Labels
 

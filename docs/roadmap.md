@@ -8,12 +8,14 @@ promised for a date, and the order can change; when it does, update this file an
 Guiding constraint for every release: **opening a file stays instant.** Heavier features
 (diagrams, export, editing) load only when used.
 
-Details of known gaps live in `backlog.md`; this file says which release picks them up. Once the
-public repo exists, each release here maps to a GitHub milestone and its items to issues
-(`issue-tracking.md`); this file stays the high-level plan. When a release ships, move its
-section to `CHANGELOG.md` and delete it here.
+Each release here maps to a GitHub milestone and its items to issues (`issue-tracking.md`); the
+issues hold the details and the discussion, and this file stays the high-level plan. Known gaps
+not tied to a release are issues without a milestone. When a release ships, move its section to
+`CHANGELOG.md` and delete it here.
 
 ## 1.1 — Export, print and copy
+
+Milestone: [1.1 Export, print and copy](https://github.com/Jawad-Chughtai/MDGlint/milestone/1)
 
 - **HTML**: a self-contained `.html` file with the current theme's styles inlined.
 - **PDF**: via WebView2's built-in print-to-PDF, with a light theme option for printing.
@@ -46,6 +48,8 @@ If it fits (otherwise a later release):
 
 ## 1.2 — Quick inline edits
 
+Milestone: [1.2 Quick inline edits](https://github.com/Jawad-Chughtai/MDGlint/milestone/2)
+
 Fix a typo or change a couple of lines without switching apps.
 
 - Toggle an edit mode (or a source pane beside the preview) for the open file.
@@ -54,6 +58,8 @@ Fix a typo or change a couple of lines without switching apps.
 - Undo, and a clear unsaved-changes indicator and prompt on close.
 
 ## 1.3 — Diagrams and rich content
+
+Milestone: [1.3 Diagrams and rich content](https://github.com/Jawad-Chughtai/MDGlint/milestone/3)
 
 - **Mermaid** diagrams (flowcharts, sequence, class, state, Gantt) rendered from ```` ```mermaid ````
   blocks, following the light or dark theme.
@@ -65,6 +71,8 @@ security model.
 
 ## 1.4 — Navigation
 
+Milestone: [1.4 Navigation](https://github.com/Jawad-Chughtai/MDGlint/milestone/4)
+
 - **Outline sidebar** built from the headings, with click-to-jump and the current section
   highlighted.
 - **Find in page** (Ctrl+F) with match count and next/previous.
@@ -72,6 +80,8 @@ security model.
 - A proper menu or command bar for the growing set of actions, with keyboard shortcuts.
 
 ## 1.5 — Tabs
+
+Milestone: [1.5 Tabs](https://github.com/Jawad-Chughtai/MDGlint/milestone/5)
 
 - **Multiple files in tabs**, each with its own scroll position and file watcher.
 - Drag and drop opens in a new tab; double-clicking another file while MDGlint is open adds a
@@ -93,7 +103,7 @@ Ideas not yet committed to a release.
 
 Not tied to a feature release; picked up as soon as practical.
 
-- **Code signing.** Removes the SmartScreen warning, which matters most for first-time users. Look
+- **Code signing** (#36). Removes the SmartScreen warning, which matters most for first-time users. Look
   at Azure Trusted Signing, a standard OV/EV certificate, and free signing programmes for open
   source (for example SignPath Foundation). Record the choice in `decisions.md`. 1.0.0 ships
   unsigned (the README explains the warning); the first step is to apply to SignPath
