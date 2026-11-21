@@ -16,9 +16,12 @@ updates:
       interval: weekly
     open-pull-requests-limit: 5
     groups:
-      # Minor and patch updates arrive as one PR a week; major updates get their own.
+      # Each group is one PR covering every project, so a package several projects use isn't
+      # split across PRs. Major updates stay apart, as they more often need code changes.
       nuget-minor-and-patch:
         update-types: [minor, patch]
+      nuget-major:
+        update-types: [major]
 
   - package-ecosystem: github-actions
     directory: /
@@ -28,3 +31,5 @@ updates:
     groups:
       actions:
         update-types: [minor, patch]
+      actions-major:
+        update-types: [major]
