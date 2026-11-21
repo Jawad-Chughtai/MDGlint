@@ -44,8 +44,7 @@
   tested without UI and reused by another front end.
 - **No third-party syntax highlighter.** *(Superseded 2026-11-19: real
   highlighting is a 1.0.0 fix, see Security below.)* A tiny inline regex
-  highlighter keeps the app small and offline. Accuracy is limited (see
-  backlog).
+  highlighter keeps the app small and offline. Accuracy is limited.
 - **2026-11-19: Assets from a virtual host, content by messaging.** The
   preview loads one shell page; bundled CSS and JS are served from a
   WebView2 virtual host mapping, and the CSP allows scripts only from that
@@ -251,7 +250,7 @@
   installing in the background (the user should choose when the app
   closes) and notify-only (users would have to download and run setup by
   hand). The hash proves the file is the one the release published, not
-  who published it; code signing (`backlog.md`) would add that.
+  who published it; code signing (issue #36) would add that.
 - **2026-11-19: Uninstall asks whether to keep settings.** As most apps
   do, the uninstaller asks whether to keep the settings (Yes is the
   default); **No** removes `%APPDATA%\MDGlint` and
@@ -358,7 +357,7 @@
 - **2026-11-19: Known rendering gaps documented, fix deferred.** Raw HTML
   and inline scripts in Markdown run, and remote images load. Decided to
   publish the gap in `SECURITY.md` and fix it later rather than block the
-  docs work. Tracked in `backlog.md`.
+  docs work. Tracked in the backlog, since retired.
 - **2026-11-19: Security and necessary fixes ship in 1.0.0.** Supersedes
   the deferral above. Blocking scripts and raw HTML, opt-in remote images,
   keeping the scroll position on reload, real syntax highlighting,

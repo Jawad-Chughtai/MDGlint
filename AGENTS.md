@@ -51,10 +51,9 @@ public.
 - `docs/roadmap.md` — planned releases in priority order. Work on the
   current release's items; don't pull later features forward without
   asking.
-- `docs/backlog.md` — known gaps with details. Check it before "fixing"
-  something that may be a known, deliberate deferral.
 - `docs/issue-tracking.md` — GitHub Issues workflow and what agents may do
-  there without asking.
+  there without asking. Known gaps and planned work are issues; check them
+  before "fixing" something that may be a known, deliberate deferral.
 - `docs/testing.md` — the kinds of tests, how to run them, and the
   coverage CI enforces.
 - `docs/releasing.md` — the full steps only when cutting a release, but
@@ -66,8 +65,7 @@ public.
   and `THIRD-PARTY-NOTICES.md` in step with the code, in the same change.
   New files go in `docs/project-index.md`; new decisions in
   `docs/decisions.md`; found or fixed gaps in GitHub Issues
-  (`docs/issue-tracking.md`), or `docs/backlog.md` until the issues are
-  set up; user-visible changes under **Unreleased** in `CHANGELOG.md`.
+  (`docs/issue-tracking.md`); user-visible changes under **Unreleased** in `CHANGELOG.md`.
 - **Keep `MDGlint.Core` free of Windows and WPF dependencies.** Anything
   platform-specific goes behind an interface in `MDGlint.Core/Contracts`
   and is implemented in `MDGlint.Desktop`.
