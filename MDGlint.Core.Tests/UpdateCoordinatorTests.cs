@@ -220,6 +220,22 @@ public sealed class UpdateCoordinatorTests : IDisposable
     }
 
     [Fact]
+    public async Task InstallOrCancelAsync_StartsSetupWithNoShutdownListener()
+    {
+        ServeRelease(_handler, Installer, SHA256.HashData(Installer));
+        _handler.Respond(Api, ReleaseJson("v1.2.0", assets:
+            [Asset(UpdateSource.InstallerName), Asset(UpdateSource.HashName)]));
+        var coordinator = new UpdateCoordinator(
+            new UpdateService(new HttpClient(_handler), "1.0.0"), _store, new AppSettings(), null, _folder, Start, () => Now);
+        await coordinator.CheckAsync(userAsked: false);
+
+        await coordinator.InstallOrCancelAsync();
+
+        Assert.Single(_started);
+        Assert.Equal("Installing MDGlint 1.2.0…", coordinator.State.Text);
+    }
+
+    [Fact]
     public async Task InstallOrCancelAsync_OffersToTryAgainAfterAHashMismatch()
     {
         var coordinator = await CoordinatorWithUpdate(SHA256.HashData([1, 2, 3]));
