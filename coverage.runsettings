@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Coverage settings for dotnet test with the settings option (see docs/testing.md). -->
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <Format>cobertura</Format>
+          <!-- Only MDGlint's own code; never the test projects. -->
+          <Include>[MDGlint.Core]*,[MDGlint.Desktop]*</Include>
+          <!-- Compiler and source-generator output (regexes, records' members, XAML), and code marked
+               as covered by the end-to-end tests instead, with the reason next to the attribute. -->
+          <ExcludeByAttribute>GeneratedCodeAttribute,CompilerGeneratedAttribute,ExcludeFromCodeCoverageAttribute</ExcludeByAttribute>
+          <SkipAutoProps>true</SkipAutoProps>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

@@ -1,0 +1,172 @@
+using System.Diagnostics;
+using System.Security.Cryptography;
+using System.Text.Json;
+using System.Windows.Automation;
+using MDGlint.Core.Models;
+
+namespace MDGlint.EndToEnd.Tests;
+
+/// <summary>
+/// The update bar against a stand-in for GitHub on 127.0.0.1 (the Debug build's update-server
+/// hook sends every update request there). Setup itself is never run: the launch log records it.
+/// </summary>
+public sealed class UpdateFlowTests
+{
+    private const string NewVersion = "9.9.9";
+    private static readonly byte[] Setup = RandomNumberGenerator.GetBytes(256 * 1024);
+
+    [EndToEndFact]
+    public async Task NeverChecksUnlessTheUserOptedIn()
+    {
+        using var github = FakeGitHub(NewVersion, Hash(Setup));
+
+        await using (var app = await AppSession.StartAsync(null, new AppOptions { UpdateServer = github.Origin }))
+        {
+            await Task.Delay(3000);
+            Assert.Empty(github.Requests);
+            Assert.Null(app.Find("UpdateBarText"));
+        }
+
+        // Nor when the user turned checks on but has already checked today.
+        var today = JsonSerializer.Serialize(DateTimeOffset.UtcNow.AddHours(-1));
+        await using (var app = await AppSession.StartAsync(null, new AppOptions
+        {
+            UpdateServer = github.Origin,
+            Settings = $$"""{"CheckForUpdates":true,"LastUpdateCheck":{{today}}}""",
+        }))
+        {
+            await Task.Delay(3000);
+            Assert.Empty(github.Requests);
+        }
+    }
+
+    [EndToEndFact]
+    public async Task InstallsAVerifiedUpdateOnlyWhenAsked()
+    {
+        using var github = FakeGitHub(NewVersion, Hash(Setup));
+
+        await using var app = await AppSession.StartAsync(null, new AppOptions
+        {
+            UpdateServer = github.Origin,
+            Settings = """{"CheckForUpdates":true}""",
+        });
+
+        var text = await app.WaitForTextAsync("UpdateBarText", t => t.Contains("is available"));
+        Assert.Equal($"MDGlint {NewVersion} is available (you have {CurrentVersion()}).", text);
+        Assert.Equal([LatestReleaseApi], github.Requests); // Nothing downloaded yet.
+        Assert.True(WindowTests.Settings(app).TryGetProperty("LastUpdateCheck", out _));
+
+        await app.InvokeAsync("UpdateNotesButton");
+        await AppSession.WaitUntilAsync(() => app.Launches().Length == 1, "Release notes didn't open.");
+        Assert.Equal($"{UpdateSource.ReleasePagePrefix}tag/v{NewVersion}|", app.Launches()[0]);
+
+        await app.InvokeAsync("UpdateInstallButton");
+
+        // Setup runs quietly, and MDGlint closes so setup can replace it.
+        Assert.True(app.Process.WaitForExit(30_000), "MDGlint didn't close for setup.");
+        var setup = app.Launches()[1].Split('|');
+        Assert.Equal(Path.GetFullPath(app.UpdatesFolder), Path.GetDirectoryName(setup[0]));
+        Assert.Equal("/SILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICATIONS /NORESTARTAPPLICATIONS /UPDATE=1", setup[1]);
+        Assert.Equal(Setup, File.ReadAllBytes(setup[0]));
+    }
+
+    [EndToEndFact]
+    public async Task RefusesAnInstallerThatDoesNotMatchItsHash()
+    {
+        using var github = FakeGitHub(NewVersion, Hash(RandomNumberGenerator.GetBytes(16)));
+
+        await using var app = await AppSession.StartAsync(null, new AppOptions
+        {
+            UpdateServer = github.Origin,
+            Settings = """{"CheckForUpdates":true}""",
+        });
+        await app.WaitForTextAsync("UpdateBarText", t => t.Contains("is available"));
+
+        await app.InvokeAsync("UpdateInstallButton");
+
+        await app.WaitForTextAsync("UpdateBarText", t => t.Contains("doesn't match the release's SHA-256"), 30);
+        Assert.Equal("Try again", app.Text("UpdateInstallLabel"));
+        Assert.Empty(app.Launches());
+        Assert.False(app.Process.HasExited);
+        Assert.Empty(Directory.Exists(app.UpdatesFolder) ? Directory.GetFiles(app.UpdatesFolder) : []);
+
+        await app.InvokeAsync("UpdateDismissButton");
+        await AppSession.WaitUntilAsync(() => app.Find("UpdateBarText") is null, "The bar didn't close.");
+    }
+
+    [EndToEndFact]
+    public async Task OffersAReleaseWithoutAHashOnlyAsALink()
+    {
+        // How a release older versions shouldn't install themselves is published (releasing.md).
+        using var github = FakeGitHub(NewVersion, Hash(Setup), withHashFile: false);
+
+        await using var app = await AppSession.StartAsync(null, new AppOptions
+        {
+            UpdateServer = github.Origin,
+            Settings = """{"CheckForUpdates":true}""",
+        });
+
+        Assert.EndsWith("Install it from its release page.", await app.WaitForTextAsync("UpdateBarText", t => t.Contains("is available")));
+        Assert.Null(app.Find("UpdateInstallButton"));
+        await app.InvokeAsync("UpdateNotesButton");
+        await AppSession.WaitUntilAsync(() => app.Launches().Length == 1, "The release page didn't open.");
+        Assert.StartsWith(UpdateSource.ReleasePagePrefix, app.Launches()[0]);
+    }
+
+    [EndToEndFact]
+    public async Task ChecksFromTheMenuAndRemembersTheChoice()
+    {
+        using var github = FakeGitHub(CurrentVersion(), Hash(Setup));
+
+        await using var app = await AppSession.StartAsync(null, new AppOptions { UpdateServer = github.Origin });
+
+        ((InvokePattern)(await app.MenuItemAsync("Check for updates now")).GetCurrentPattern(InvokePattern.Pattern)).Invoke();
+        Assert.Equal($"MDGlint {CurrentVersion()} is the latest version.",
+            await app.WaitForTextAsync("UpdateBarText", t => t.Contains("latest")));
+        // Asking once doesn't turn on the daily check.
+        Assert.False(WindowTests.Settings(app).GetProperty("CheckForUpdates").GetBoolean());
+
+        var automatic = await app.MenuItemAsync("Check for updates automatically");
+        Assert.Equal(ToggleState.Off, ((TogglePattern)automatic.GetCurrentPattern(TogglePattern.Pattern)).Current.ToggleState);
+        ((InvokePattern)automatic.GetCurrentPattern(InvokePattern.Pattern)).Invoke();
+        await AppSession.WaitUntilAsync(() => WindowTests.Settings(app).GetProperty("CheckForUpdates").GetBoolean(), "The choice wasn't saved.");
+    }
+
+    private static string LatestReleaseApi => "/" + UpdateSource.LatestReleaseApi.Host + UpdateSource.LatestReleaseApi.AbsolutePath;
+
+    /// <summary>The version the app reports: the build's version without its commit.</summary>
+    private static string CurrentVersion() =>
+        AppVersion.ToDisplay(FileVersionInfo.GetVersionInfo(AppSession.AppPath()).ProductVersion);
+
+    private static string Hash(byte[] file) => Convert.ToHexString(SHA256.HashData(file)).ToLowerInvariant();
+
+    /// <summary>GitHub's latest-release API and the release's two files, at the paths the app asks for.</summary>
+    private static LocalServer FakeGitHub(string version, string hash, bool withHashFile = true)
+    {
+        var download = $"{UpdateSource.DownloadPrefix}v{version}/";
+        var assets = new List<object>
+        {
+            new { name = UpdateSource.InstallerName, browser_download_url = download + UpdateSource.InstallerName, size = Setup.Length },
+        };
+        if (withHashFile)
+        {
+            assets.Add(new { name = UpdateSource.HashName, browser_download_url = download + UpdateSource.HashName, size = 100 });
+        }
+
+        var release = JsonSerializer.SerializeToUtf8Bytes(new
+        {
+            tag_name = $"v{version}",
+            html_url = $"{UpdateSource.ReleasePagePrefix}tag/v{version}",
+            draft = false,
+            prerelease = false,
+            assets,
+        });
+        var downloadPath = "/" + new Uri(download).Host + new Uri(download).AbsolutePath;
+
+        return new LocalServer(path =>
+            path == LatestReleaseApi ? new LocalServer.Response(200, "application/json", release)
+            : path == downloadPath + UpdateSource.InstallerName ? new LocalServer.Response(200, "application/octet-stream", Setup)
+            : path == downloadPath + UpdateSource.HashName ? new LocalServer.Response(200, "text/plain", DevTools.Utf8($"{hash}  {UpdateSource.InstallerName}"))
+            : LocalServer.NotFound);
+    }
+}

@@ -1,0 +1,26 @@
+<Project>
+
+  <!--
+    Shared by every project in the repository. The MDGlint version is set here and nowhere else:
+    the build stamps it into the exe (file and product version, shown in the app's toolbar), and
+    Install\build-installer.ps1 reads it and passes it to Inno Setup. To release, change it here
+    (docs/releasing.md).
+  -->
+  <PropertyGroup>
+    <Version>1.0.0</Version>
+    <Product>MDGlint</Product>
+  </PropertyGroup>
+
+  <!--
+    No Release build carries the folder it was built in. The compiler writes the symbol file's
+    path and source paths into the binaries, and a local folder usually includes a user name, so
+    the repository root is mapped to /_/ in Release builds (the installer packs one). Debug
+    builds keep real paths so the debugger finds the sources; they are never shipped. GitHub
+    Actions builds are also marked as CI builds, which makes them deterministic.
+  -->
+  <PropertyGroup>
+    <PathMap Condition="'$(Configuration)' == 'Release'">$(MSBuildThisFileDirectory)=/_/</PathMap>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+</Project>

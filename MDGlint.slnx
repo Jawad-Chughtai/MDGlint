@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="MDGlint.Core.Tests/MDGlint.Core.Tests.csproj" />
+  <Project Path="MDGlint.Core/MDGlint.Core.csproj" />
+  <Project Path="MDGlint.Desktop.Tests/MDGlint.Desktop.Tests.csproj" />
+  <Project Path="MDGlint.Desktop/MDGlint.Desktop.csproj" />
+  <Project Path="MDGlint.EndToEnd.Tests/MDGlint.EndToEnd.Tests.csproj" />
+</Solution>

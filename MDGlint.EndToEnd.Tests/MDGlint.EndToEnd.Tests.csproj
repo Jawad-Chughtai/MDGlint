@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Drives the real app: starts the Debug build of MDGlint.Desktop.exe with its test hooks,
+    reads and clicks the preview over the DevTools protocol and the window over UI Automation
+    (docs/testing.md).
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <!-- UI Automation's client assemblies come with the WPF framework. -->
+    <UseWPF>true</UseWPF>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="System.IO" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MDGlint.Core\MDGlint.Core.csproj" />
+    <!-- Built first; the tests start it from its own output folder rather than referencing it. -->
+    <ProjectReference Include="..\MDGlint.Desktop\MDGlint.Desktop.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+</Project>

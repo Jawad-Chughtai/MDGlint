@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <!--
+    The preview shell. It is loaded once from https://app.mdglint.example/ (a WebView2 virtual
+    host mapped to this folder); rendered Markdown arrives later as a message and is inserted into
+    #mdglint-content. Scripts may only come from this origin, so script inside a Markdown file
+    never runs. Relative links and images resolve against the <base>, which the app points at the
+    open file's folder on https://doc.mdglint.example/ (local files, served by the app).
+  -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https://doc.mdglint.example data: https: http:; media-src https://doc.mdglint.example https: http:; font-src 'self'; base-uri https://doc.mdglint.example; form-action 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <base id="mdglint-base">
+  <title>MDGlint</title>
+  <link rel="icon" href="data:,">
+  <link id="mdglint-markdown-theme" rel="stylesheet" href="vendor/github-markdown-css/github-markdown-light.css">
+  <link id="mdglint-code-theme" rel="stylesheet" href="vendor/highlight.js/github.min.css">
+  <link rel="stylesheet" href="app.css">
+  <script src="vendor/highlight.js/highlight.min.js"></script>
+  <script src="vendor/highlight.js/languages/powershell.min.js"></script>
+  <script src="vendor/highlight.js/languages/dos.min.js"></script>
+  <script src="vendor/highlight.js/languages/dockerfile.min.js"></script>
+  <script src="preview.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body hidden>
+  <main id="mdglint-content" class="markdown-body"></main>
+</body>
+</html>

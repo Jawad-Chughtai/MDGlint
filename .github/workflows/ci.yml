@@ -1,0 +1,105 @@
+# Builds and tests every pull request and every push to main (docs/testing.md).
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      # Actions are pinned to a commit; the comment names the release it is.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: 10.0.x
+
+      # Node's built-in test runner tests the preview script; no npm packages are installed.
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+
+      - name: Build Release
+        run: dotnet build MDGlint.slnx -c Release
+
+      # The tests run against the Debug build: the end-to-end tests need its test hooks.
+      - name: Build Debug
+        run: dotnet build MDGlint.slnx -c Debug
+
+      - name: Unit tests
+        shell: pwsh
+        run: |
+          foreach ($project in 'Core', 'Desktop') {
+              dotnet test "MDGlint.$project.Tests" -c Debug --no-build --settings coverage.runsettings `
+                  --collect "XPlat Code Coverage" --results-directory "TestResults/$project"
+              if ($LASTEXITCODE -ne 0) { throw "MDGlint.$project.Tests failed." }
+          }
+
+      - name: Preview script tests
+        run: >-
+          node --test --experimental-test-coverage
+          --test-coverage-include=MDGlint.Desktop/Assets/preview.js
+          --test-reporter=spec --test-reporter-destination=stdout
+          --test-reporter=lcov --test-reporter-destination=TestResults/preview.lcov
+          "MDGlint.Desktop.Tests/Preview/*.test.mjs"
+
+      - name: Coverage
+        shell: pwsh
+        run: ./.github/scripts/Test-Coverage.ps1
+
+      # The end-to-end tests start the real app, which needs the WebView2 Runtime.
+      - name: Install WebView2 Runtime
+        shell: pwsh
+        run: ./.github/scripts/Install-WebView2.ps1
+
+      - name: End-to-end tests
+        timeout-minutes: 10
+        run: dotnet test MDGlint.EndToEnd.Tests -c Debug --no-build
+
+  # Installs, updates and uninstalls MDGlint on the runner, so it never runs on a developer's PC
+  # by accident (the script refuses outside CI).
+  installer:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: |
+          if (-not (Get-Command ISCC.exe -ErrorAction SilentlyContinue) -and
+              -not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe") -and
+              -not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 7\ISCC.exe") -and
+              -not (Test-Path "$env:ProgramFiles\Inno Setup 7\ISCC.exe")) {
+              choco install innosetup --yes --no-progress
+              if ($LASTEXITCODE -ne 0) { throw "Installing Inno Setup failed ($LASTEXITCODE)." }
+          }
+
+      # Without the runtime, setup stops at its "WebView2 is missing" message and the tests hang.
+      - name: Install WebView2 Runtime
+        shell: pwsh
+        run: ./.github/scripts/Install-WebView2.ps1
+
+      - name: Installer tests
+        timeout-minutes: 15
+        shell: pwsh
+        run: ./.github/scripts/Test-Installer.ps1

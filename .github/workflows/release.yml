@@ -1,0 +1,98 @@
+# Builds a release when a version tag (v1.2.3) is pushed: tests, builds the installer on a clean
+# runner, hashes it, and creates a draft GitHub Release with the installer, its SHA-256 and the
+# changelog section. The maintainer adds the showcase images and publishes the draft
+# (docs/releasing.md).
+#
+# The job runs in the `release` environment, so a pushed tag waits for the maintainer to approve
+# the run, and the installer gets a signed build-provenance attestation. Both need the repository
+# to be public on GitHub's free plan.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write       # create the draft release
+  id-token: write       # sign the attestation
+  attestations: write   # store the attestation
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    # Waits for the maintainer's approval; only `v*` tags may deploy to it (docs/releasing.md).
+    environment: release
+    steps:
+      # Actions are pinned to a commit; the comment names the release it is.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Check the tag matches the version
+        id: version
+        shell: pwsh
+        run: |
+          $version = (& dotnet msbuild MDGlint.Desktop/MDGlint.Desktop.csproj -nologo -getProperty:Version | Out-String).Trim()
+          if ($env:GITHUB_REF_NAME -ne "v$version") {
+              throw "Tag $env:GITHUB_REF_NAME doesn't match the version in Directory.Build.props ($version)."
+          }
+          "version=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Test
+        run: dotnet test MDGlint.slnx -c Release
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: |
+          if (-not (Get-Command ISCC.exe -ErrorAction SilentlyContinue) -and
+              -not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe") -and
+              -not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 7\ISCC.exe") -and
+              -not (Test-Path "$env:ProgramFiles\Inno Setup 7\ISCC.exe")) {
+              choco install innosetup --yes --no-progress
+              if ($LASTEXITCODE -ne 0) { throw "Installing Inno Setup failed ($LASTEXITCODE)." }
+          }
+
+      - name: Build the installer
+        shell: pwsh
+        run: ./MDGlint.Desktop/Install/build-installer.ps1
+
+      - name: Hash the installer and write the notes
+        shell: pwsh
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          $output = 'MDGlint.Desktop/Install/Output'
+          $hash = (Get-FileHash "$output/MDGlintSetup.exe" -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  MDGlintSetup.exe" | Set-Content -Path "$output/MDGlintSetup.exe.sha256" -Encoding ascii -NoNewline
+          $notes = ./.github/scripts/Get-ReleaseNotes.ps1 -Version $env:VERSION -Changelog CHANGELOG.md
+          @($notes, '', '**SHA-256** of `MDGlintSetup.exe`:', '', '```', $hash, '```') -join "`n" |
+              Set-Content -Path release-notes.md -Encoding utf8
+
+      # Anyone can check that the installer was built here, from this tag's commit:
+      # gh attestation verify MDGlintSetup.exe -R Jawad-Chughtai/MDGlint
+      - name: Attest the installer's build provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: MDGlint.Desktop/Install/Output/MDGlintSetup.exe
+
+      - name: Create the draft release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          $output = 'MDGlint.Desktop/Install/Output'
+          $arguments = @($env:GITHUB_REF_NAME, "$output/MDGlintSetup.exe", "$output/MDGlintSetup.exe.sha256",
+              '--draft', '--verify-tag', '--title', "MDGlint $env:VERSION", '--notes-file', 'release-notes.md')
+          if ($env:VERSION.Contains('-')) { $arguments += '--prerelease' }
+          gh release create @arguments
+          if ($LASTEXITCODE -ne 0) { throw "Creating the release failed ($LASTEXITCODE)." }

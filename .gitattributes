@@ -1,0 +1,3 @@
+# Bundled third-party files stay byte-for-byte as published, so they can be compared with
+# the upstream release when updating.
+MDGlint.Desktop/Assets/vendor/** -text
