@@ -105,7 +105,7 @@ Not tied to a feature release; picked up as soon as practical.
 
 - **Code signing** (#36). Removes the SmartScreen warning, which matters most for first-time users. Look
   at Azure Trusted Signing, a standard OV/EV certificate, and free signing programmes for open
-  source (for example SignPath Foundation). Record the choice in `decisions.md`. 1.0.0 ships
+  source (for example SignPath Foundation). Record the choice in `decisions.md`. 1.0.0 shipped
   unsigned (the README explains the warning); the first step is to apply to SignPath
   Foundation, which needs the repository to be public (it is since 2026-11-21).
 - **Keep the self-contained build.** .NET stays bundled; WebView2 stays the Evergreen runtime
