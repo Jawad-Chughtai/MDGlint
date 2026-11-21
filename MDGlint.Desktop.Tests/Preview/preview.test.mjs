@@ -272,7 +272,7 @@ test('inPageTarget handles only # links, decoding them safely', () => {
 test('findTarget looks for an id, then a name', () => {
   const byId = { found: 'id' };
   const byName = { found: 'name' };
-  const escape = (id) => id.replace(/"/g, '\\"');
+  const escape = (id) => id.replace(/[\\"]/g, '\\$&');
   const queries = [];
   const root = (results) => ({
     querySelector: (selector) => {
