@@ -107,7 +107,7 @@ Not tied to a feature release; picked up as soon as practical.
   at Azure Trusted Signing, a standard OV/EV certificate, and free signing programmes for open
   source (for example SignPath Foundation). Record the choice in `decisions.md`. 1.0.0 ships
   unsigned (the README explains the warning); the first step is to apply to SignPath
-  Foundation once the repository is public.
+  Foundation, which needs the repository to be public (it is since 2026-11-21).
 - **Keep the self-contained build.** .NET stays bundled; WebView2 stays the Evergreen runtime
   that Windows provides and updates (`decisions.md`).
 - **Tests stay at full coverage** since 1.0.0: CI enforces it (`testing.md`).

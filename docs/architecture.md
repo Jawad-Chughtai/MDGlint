@@ -192,8 +192,9 @@ working").
 GitHub Actions runs two workflows. `ci.yml` builds and tests every pull request and push to
 `main`: one job builds Release and Debug, runs the unit, preview-script and end-to-end tests
 and checks coverage (`Test-Coverage.ps1`); another installs, updates and uninstalls MDGlint on
-the runner (`Test-Installer.ps1`). `release.yml` runs on a `v*` tag: it checks the tag against `<Version>`, tests,
-builds the installer with `build-installer.ps1`, and creates a draft release with the
+the runner (`Test-Installer.ps1`). `release.yml` runs on a `v*` tag, in the `release` environment, so it waits for the
+maintainer's approval: it checks the tag against `<Version>`, tests, builds the installer with
+`build-installer.ps1`, attests its build provenance, and creates a draft release with the
 installer, its `.sha256` file and the notes from `.github/scripts/Get-ReleaseNotes.ps1` (the
 version's `CHANGELOG.md` section) plus the hash.
 
