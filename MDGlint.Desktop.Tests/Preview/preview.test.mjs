@@ -269,6 +269,21 @@ test('highlightCode highlights only languages highlight.js knows', () => {
   assert.deepEqual(highlighted, [blocks[0]]);
 });
 
+test('codeText copies the code without the block\'s closing newline', () => {
+  const pre = (code, text) => ({ querySelector: () => code, textContent: text });
+  assert.equal(preview.codeText(pre({ textContent: 'let x = 1;\nlet y = 2;\n' })), 'let x = 1;\nlet y = 2;');
+  assert.equal(preview.codeText(pre({ textContent: 'keep\n\n' })), 'keep\n');
+  assert.equal(preview.codeText(pre({ textContent: 'no newline' })), 'no newline');
+  // A <pre> without <code> (raw HTML in the file): its own text.
+  assert.equal(preview.codeText(pre(null, 'plain\n')), 'plain');
+});
+
+test('copyLabel says what the Copy button did', () => {
+  assert.equal(preview.copyLabel('copied'), 'Copied');
+  assert.equal(preview.copyLabel('failed'), "Couldn't copy");
+  assert.equal(preview.copyLabel('ready'), 'Copy');
+});
+
 test('inPageTarget handles only # links, decoding them safely', () => {
   assert.equal(preview.inPageTarget('#setup'), 'setup');
   assert.equal(preview.inPageTarget('#caf%C3%A9'), 'café');

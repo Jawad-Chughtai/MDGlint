@@ -300,8 +300,9 @@ public partial class MainWindow : Window
 
     private void MoreButton_Click(object sender, RoutedEventArgs e)
     {
-        PrintMenuItem.IsEnabled = CanPrint;
-        ExportMenuItem.IsEnabled = CanPrint;
+        PrintMenuItem.IsEnabled = FileShown;
+        ExportMenuItem.IsEnabled = FileShown;
+        CopyMarkdownMenuItem.IsEnabled = FileShown;
         PrintLightMenuItem.IsChecked = _settings.PrintInLightTheme;
         AutoUpdateMenuItem.IsChecked = _updates.AutomaticChecks;
         CheckNowMenuItem.IsEnabled = !_updates.IsBusy;
@@ -317,23 +318,51 @@ public partial class MainWindow : Window
     }
 
     /// <summary>A file is shown (not the no-file page or a "File not found" message).</summary>
-    private bool CanPrint => _preview is not null && _shownFilePath is not null && File.Exists(_shownFilePath);
+    private bool FileShown => _preview is not null && _shownFilePath is not null && File.Exists(_shownFilePath);
 
     private void PrintMenuItem_Click(object sender, RoutedEventArgs e) => Print();
 
     private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
     {
-        // Also over the preview, where WebView2 would otherwise show its own print preview.
+        // Also over the preview, where WebView2 would otherwise show its own print preview (and, in
+        // Debug builds, open DevTools for Ctrl+Shift+C).
         if (e.Key == Key.P && Keyboard.Modifiers == ModifierKeys.Control)
         {
             e.Handled = true;
             Print();
         }
+        else if (e.Key == Key.C && Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift))
+        {
+            e.Handled = true;
+            _ = CopyMarkdownAsync();
+        }
+    }
+
+    private async void CopyMarkdownMenuItem_Click(object sender, RoutedEventArgs e) => await CopyMarkdownAsync();
+
+    /// <summary>Copies the shown file's Markdown as it is on disk now, as plain text.</summary>
+    private async Task CopyMarkdownAsync()
+    {
+        if (!FileShown)
+        {
+            return;
+        }
+
+        var shown = _shownFilePath!;
+        try
+        {
+            Clipboard.SetText(await _fileReader.ReadAsync(shown));
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ExternalException)
+        {
+            MessageBox.Show(this, $"MDGlint couldn't copy {Path.GetFileName(shown)}.", "Copy Markdown",
+                MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     private void Print()
     {
-        if (CanPrint)
+        if (FileShown)
         {
             _preview!.ShowPrintDialog();
         }
@@ -341,7 +370,7 @@ public partial class MainWindow : Window
 
     private async void ExportPdfMenuItem_Click(object sender, RoutedEventArgs e)
     {
-        if (!CanPrint)
+        if (!FileShown)
         {
             return;
         }

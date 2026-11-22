@@ -39,5 +39,20 @@
       <p class="message">Or drop a Markdown file here.</p>
     </div>
   </template>
+  <!--
+    Put beside every code block by app.js. Like the Open button, it belongs to the shell, so the
+    rendered file can't add one or point one at anything else.
+  -->
+  <template id="mdglint-copy-button">
+    <button type="button" class="copy-code" aria-label="Copy" title="Copy">
+      <svg class="copy-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+        <rect x="5.5" y="5.5" width="8" height="9" rx="1.5" />
+        <path d="M10.5 3.5v-.5A1.5 1.5 0 0 0 9 1.5H4A1.5 1.5 0 0 0 2.5 3v6A1.5 1.5 0 0 0 4 10.5h.5" />
+      </svg>
+      <svg class="copied-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+        <path d="M3 8.5l3 3 7-7" />
+      </svg>
+    </button>
+  </template>
 </body>
 </html>

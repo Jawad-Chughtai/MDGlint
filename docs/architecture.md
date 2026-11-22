@@ -125,6 +125,18 @@ render and theme messages carry `printLight`. `app.js` then limits the dark styl
 `preview.js`). `app.css` undoes its own dark rules under `@media print`. The screen never
 changes, and nothing has to switch back after printing.
 
+## Copying
+
+After each render, `app.js` wraps every `<pre>` in a `div.code-block` with a Copy button
+cloned from the shell's `#mdglint-copy-button` template. A trusted click on one of those
+buttons copies `codeText` (`preview.js`): the block's text without its closing newline. The
+copy goes through `navigator.clipboard.writeText`, and the button shows a tick, or "Couldn't
+copy", for two seconds. The buttons are hidden when printing.
+
+**Copy Markdown** (⋯ menu or Ctrl+Shift+C, offered only while a file is shown) reads the shown
+file from disk and puts its text on the clipboard with WPF's `Clipboard.SetText`. If the file
+can't be read or the clipboard is busy, it shows an error.
+
 ## Remote content
 
 The CSP lets images and media come from any `http:`/`https:` address, and `PreviewHost` decides:

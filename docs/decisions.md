@@ -161,6 +161,17 @@
   places, which keeps the browser's text off and the page's margins as set
   in the dialog. Rejected: `@page { margin: 0 }`, which also hides the
   browser's text but prints to the paper's edge.
+- **2026-11-22: Copying (#15).** A code block's Copy button copies in the
+  page, with `navigator.clipboard.writeText`. The page is a secure context
+  and the click is the user's, so no permission or app code is needed. The
+  button comes from the shell (`index.html`), and `app.js` acts only on
+  buttons it made and only on trusted clicks, so a file can't add or aim
+  one. It copies the code as written, highlighting aside. **Copy Markdown**
+  (⋯ menu, Ctrl+Shift+C) is done by the app: it reads the shown file from
+  disk and puts its text on the clipboard, so the copy is the file itself,
+  not the rendered page. Rejected: a message asking the app to copy page
+  text, which would let the page put any text on the clipboard through the
+  app.
 
 ## Packaging and distribution
 

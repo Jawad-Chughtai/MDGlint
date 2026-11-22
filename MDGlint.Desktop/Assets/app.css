@@ -81,6 +81,86 @@ html[data-theme="dark"] .markdown-body .open-prompt button:hover {
 }
 
 /*
+  The Copy button app.js puts in each code block's top-right corner, like GitHub's: shown while
+  the pointer is over the block or the button has keyboard focus, and a tick once it has copied.
+*/
+.markdown-body .code-block {
+  position: relative;
+}
+
+.markdown-body .copy-code {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  color: #59636e;
+  background-color: #f6f8fa;
+  border: 1px solid #d1d9e0;
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0;
+}
+
+.markdown-body .code-block:hover .copy-code,
+.markdown-body .copy-code:focus-visible,
+.markdown-body .copy-code[data-state="copied"],
+.markdown-body .copy-code[data-state="failed"] {
+  opacity: 1;
+}
+
+.markdown-body .copy-code:hover {
+  background-color: #eff2f5;
+}
+
+.markdown-body .copy-code svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.markdown-body .copy-code .copied-icon,
+.markdown-body .copy-code[data-state="copied"] .copy-icon {
+  display: none;
+}
+
+.markdown-body .copy-code[data-state="copied"] .copied-icon {
+  display: block;
+}
+
+.markdown-body .copy-code[data-state="copied"] {
+  color: #1a7f37;
+}
+
+.markdown-body .copy-code[data-state="failed"] {
+  color: #d1242f;
+}
+
+html[data-theme="dark"] .markdown-body .copy-code {
+  color: #9198a1;
+  background-color: #212830;
+  border-color: #3d444d;
+}
+
+html[data-theme="dark"] .markdown-body .copy-code:hover {
+  background-color: #262c36;
+}
+
+html[data-theme="dark"] .markdown-body .copy-code[data-state="copied"] {
+  color: #3fb950;
+}
+
+html[data-theme="dark"] .markdown-body .copy-code[data-state="failed"] {
+  color: #f85149;
+}
+
+/*
   Printing and PDF export. The page's margins come from the print settings, and app.js sets
   data-print-theme to the theme the printout uses; with the light one while the window is dark,
   these undo the dark rules above (the print stylesheet links in index.html do the same for the
@@ -127,5 +207,9 @@ html[data-theme="dark"] .markdown-body .open-prompt button:hover {
 
   html[data-print-theme="light"] .markdown-body .message {
     color: #59636e;
+  }
+
+  .markdown-body .copy-code {
+    display: none;
   }
 }

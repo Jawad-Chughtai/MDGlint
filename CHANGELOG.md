@@ -16,6 +16,10 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Export ▸ PDF…** in the **⋯** menu, saved beside the open file by default (#12).
 - **Print in light theme** in the **⋯** menu, on by default: printouts and PDFs use the light
   theme while the window shows the dark one.
+- A **Copy** button on each code block, shown when the pointer is over it, which copies the
+  code as written (#15).
+- **Copy Markdown** in the **⋯** menu, also with Ctrl+Shift+C, which copies the whole file's
+  Markdown as plain text (#15).
 - PDFs are titled with the file's name.
 - Printouts and PDFs have a footer with "MDGlint" and the page number ("1 / 4"), in place of
   the print dialog's header and footer (date, title, the preview's internal address).
