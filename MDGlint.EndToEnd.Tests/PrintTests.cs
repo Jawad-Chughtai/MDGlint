@@ -43,7 +43,8 @@ public sealed class PrintTests : IDisposable
     public async Task ExportsThePdfBesideTheFile()
     {
         var file = Write("notes.md", "# Notes\n\nSome text.");
-        var pdf = Path.Combine(_docs, "exported.pdf");
+        // The suggested name, in the file's folder: the test keeps the dialog's suggestion.
+        var pdf = Path.Combine(_docs, "notes.pdf");
 
         await using var app = await AppSession.StartAsync(file);
         await app.Page.WaitForAsync("document.querySelector('h1')?.textContent === 'Notes'");
@@ -59,7 +60,6 @@ public sealed class PrintTests : IDisposable
             new PropertyCondition(AutomationElement.AutomationIdProperty, "1001")));
         // Without the extension where Explorer hides known ones (the Windows default).
         Assert.Contains(((ValuePattern)name.GetCurrentPattern(ValuePattern.Pattern)).Current.Value, new[] { "notes.pdf", "notes" });
-        ((ValuePattern)name.GetCurrentPattern(ValuePattern.Pattern)).SetValue(pdf);
         var save = dialog.FindFirst(TreeScope.Children, new AndCondition(
             new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Button),
             new PropertyCondition(AutomationElement.AutomationIdProperty, "1")));
@@ -72,7 +72,9 @@ public sealed class PrintTests : IDisposable
         }
         catch (TimeoutException)
         {
-            throw new TimeoutException($"The PDF wasn't saved. The app shows: {OpenWindows(app)}");
+            var pdfs = Directory.GetFiles(_docs, "*.pdf", SearchOption.AllDirectories).Select(Path.GetFileName);
+            throw new TimeoutException(
+                $"The PDF wasn't saved. PDFs in the folder: [{string.Join(", ", pdfs)}]. The app shows: {OpenWindows(app)}");
         }
     }
 
