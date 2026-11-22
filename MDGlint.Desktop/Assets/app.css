@@ -85,7 +85,32 @@ html[data-theme="dark"] .markdown-body .open-prompt button:hover {
   data-print-theme to the theme the printout uses; with the light one while the window is dark,
   these undo the dark rules above (the print stylesheet links in index.html do the same for the
   Markdown and code themes).
+
+  Every printed page and PDF page has MDGlint's own footer: "MDGlint" on the left and the page
+  number on the right. The print dialog's header and footer (date, title, the shell page's
+  address, page number) are kept out by filling all six places they go, the others with an empty
+  box: Chromium leaves out its own text wherever a page's @page rule fills that place, and the
+  page keeps its margins.
 */
+@page {
+  @top-left { content: ""; }
+  @top-center { content: ""; }
+  @top-right { content: ""; }
+  @bottom-center { content: ""; }
+
+  @bottom-left {
+    content: "MDGlint";
+    font: 9pt "Segoe UI", system-ui, sans-serif;
+    color: #59636e;
+  }
+
+  @bottom-right {
+    content: counter(page) " / " counter(pages);
+    font: 9pt "Segoe UI", system-ui, sans-serif;
+    color: #59636e;
+  }
+}
+
 @media print {
   .markdown-body {
     max-width: none;
