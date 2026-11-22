@@ -65,8 +65,32 @@ public sealed class PrintTests : IDisposable
             new PropertyCondition(AutomationElement.AutomationIdProperty, "1")));
         ((InvokePattern)save.GetCurrentPattern(InvokePattern.Pattern)).Invoke();
 
-        await AppSession.WaitUntilAsync(() => File.Exists(pdf) && new FileInfo(pdf).Length > 0, "The PDF wasn't saved.");
-        await AppSession.WaitUntilAsync(() => StartsWithPdfHeader(pdf), "The file isn't a PDF.");
+        // A runner's first PDF can take a while; if none comes, say what the app is showing.
+        try
+        {
+            await AppSession.WaitUntilAsync(() => StartsWithPdfHeader(pdf), "The PDF wasn't saved.", seconds: 60);
+        }
+        catch (TimeoutException)
+        {
+            throw new TimeoutException($"The PDF wasn't saved. The app shows: {OpenWindows(app)}");
+        }
+    }
+
+    /// <summary>The app's windows and the text in them, such as a dialog still open or an error.</summary>
+    private static string OpenWindows(AppSession app)
+    {
+        var windows = AutomationElement.RootElement.FindAll(TreeScope.Children,
+            new PropertyCondition(AutomationElement.ProcessIdProperty, app.Process.Id));
+        return string.Join(" | ", windows.Cast<AutomationElement>().Select(window =>
+        {
+            var texts = window.FindAll(TreeScope.Descendants,
+                    new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Text))
+                .Cast<AutomationElement>()
+                .Select(text => text.Current.Name)
+                .Where(text => text.Length > 0)
+                .Take(10);
+            return $"\"{window.Current.Name}\": {string.Join("; ", texts)}";
+        }));
     }
 
     [EndToEndFact]
