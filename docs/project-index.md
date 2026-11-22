@@ -82,9 +82,9 @@ Where things live. Keep this current when files are added, moved, or removed.
 | Path | What |
 |---|---|
 | `App.xaml(.cs)` | Startup, command-line file argument, unhandled-error dialog and log |
-| `MainWindow.xaml(.cs)` | Toolbar (version, Open, Reload, Remote, theme, ⋯ menu with update options), remote-content bar, update bar, WebView2 setup (crash reports kept local) and the notice when it can't start, drag and drop on the toolbar, window placement, theme chrome |
+| `MainWindow.xaml(.cs)` | Toolbar (version, Open, Reload, Remote, theme, ⋯ menu with Print, Export, the print-theme choice and update options), Ctrl+P, remote-content bar, update bar, WebView2 setup (crash reports kept local) and the notice when it can't start, drag and drop on the toolbar, window placement, theme chrome |
 | `AssemblyInfo.cs` | WPF theme info; internals visible to `MDGlint.Desktop.Tests` |
-| `Services/PreviewHost.cs` | Applies `PreviewPolicy` to WebView2: shell page, local file responses, remote-content blocking, render/theme messages, files dropped on the preview, the no-file page's Open request, navigation and links; SmartScreen off |
+| `Services/PreviewHost.cs` | Applies `PreviewPolicy` to WebView2: shell page, local file responses, remote-content blocking, render/theme messages (with the print theme), printing and PDF export, files dropped on the preview, the no-file page's Open request, navigation and links; SmartScreen off |
 | `Services/FileMarkdownReader.cs` | `IMarkdownFileReader` over the file system |
 | `Services/AppSettingsStore.cs` | `ISettingsStore` as JSON in `%APPDATA%\MDGlint` |
 | `Services/FileWatcherService.cs` | Watches the open file; 250 ms debounced reload on the window's thread |
@@ -94,6 +94,7 @@ Where things live. Keep this current when files are added, moved, or removed.
 | `Helpers/DocumentUrls.cs` | Local path ↔ `https://doc.mdglint.example/C/...` URL mapping |
 | `Helpers/ErrorLog.cs` | Saves unhandled-error details; the error dialog's text |
 | `Helpers/MarkdownFiles.cs` | `.md`/`.markdown` extension check |
+| `Helpers/ExportFiles.cs` | Where the Export dialogs start: the open file's folder and name |
 | `Helpers/PreviewPolicy.cs` | The preview's rules: the shell page, which local files load and as what, blocked remote requests, accepted messages, what a clicked link does |
 | `Helpers/ProcessLauncher.cs` | Starts every program MDGlint opens (browser, Explorer, setup); the Debug launch log |
 | `Helpers/WindowPlacement.cs` | Where the window opens (maximized by default, else its saved bounds fitted to the screen) and what it saves on closing |
@@ -112,7 +113,7 @@ Where things live. Keep this current when files are added, moved, or removed.
 |---|---|
 | `DocumentUrlsTests.cs` | Path ↔ URL mapping, refused paths |
 | `PreviewPolicyTests.cs` | Shell page, local media types, remote blocking, messages, link actions |
-| `HelpersTests.cs` | `MarkdownFiles`, `AppPaths`, `ProcessLauncher`, `ErrorLog`, `FileMarkdownReader`, `BrowserArguments` |
+| `HelpersTests.cs` | `MarkdownFiles`, `ExportFiles`, `AppPaths`, `ProcessLauncher`, `ErrorLog`, `FileMarkdownReader`, `BrowserArguments` |
 | `ServicesTests.cs` | `AppSettingsStore`, `UpdateLauncher` (registry, downloads, starting setup, HTTP client) |
 | `FileWatcherServiceTests.cs` | Saves, renames, deletes, debouncing, stopping, the window's thread |
 | `WindowPlacementTests.cs` | Default maximized, restoring and fitting saved bounds, what closing saves |
@@ -126,5 +127,6 @@ Where things live. Keep this current when files are added, moved, or removed.
 | `DevTools.cs` | DevTools protocol client for the preview page |
 | `LocalServer.cs` | HTTP server on 127.0.0.1 standing in for remote hosts and GitHub |
 | `PreviewTests.cs` | Scripts blocked, local images and refused files, links, files dropped on the preview, the no-file page's Open button, `#` jumps, keeping the reader's place |
+| `PrintTests.cs` | The light print theme and turning it off, PDF export beside the file, Print and Export only with a file open |
 | `WindowTests.cs` | Theme, remote content, opening maximized and where it was left, the WebView2-missing notice |
 | `UpdateFlowTests.cs` | Opt-in respected, install only on request, hash mismatch, the ⋯ menu |

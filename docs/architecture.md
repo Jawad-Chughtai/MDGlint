@@ -97,6 +97,20 @@ later (see `decisions.md`).
 immersive dark mode attribute), sets the WebView2 background colour to match, and tells the page
 to switch stylesheets: the github-markdown-css and highlight.js theme for the new colour.
 
+## Printing and PDF export
+
+**Print…** (⋯ menu or Ctrl+P) opens the system print dialog (`ShowPrintUI`). **Export ▸ PDF…**
+saves the file with WebView2's `PrintToPdfAsync` beside the open file by default
+(`ExportFiles`), with backgrounds and no browser header or footer. Both print the page as it is
+shown, so a PDF has the same images, and the same remote-content choice, as the preview. Both
+are offered only while a file is shown.
+
+With **Print in light theme** on (`PrintInLightTheme`, the default) and the dark theme showing,
+render and theme messages carry `printLight`. `app.js` then limits the dark stylesheets to
+`screen` and turns on the light ones in `index.html` for `print` (`printPlan` in
+`preview.js`). `app.css` undoes its own dark rules under `@media print`. The screen never
+changes, and nothing has to switch back after printing.
+
 ## Remote content
 
 The CSP lets images and media come from any `http:`/`https:` address, and `PreviewHost` decides:

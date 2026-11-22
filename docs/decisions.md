@@ -128,6 +128,17 @@
   dialog, so the page can never choose what opens. Rejected: rendering the
   button as part of the message HTML, which would make it content any file
   could imitate.
+- **2026-11-22: Print and PDF go through WebView2, in the light theme by
+  default.** Print uses the system dialog (`ShowPrintUI`), and PDF export uses
+  `PrintToPdfAsync`. Both are built in, so no library or extra download is
+  needed and nothing leaves the PC. They print what the preview shows, so
+  images follow the same remote-content choice. Printouts use the light
+  theme unless **Print in light theme** is turned off, since dark pages waste
+  ink and read poorly on paper. The switch is made with print-only
+  stylesheets (`media="print"`), so the screen never changes. Rejected:
+  switching the page to light while printing (the dialog gives no reliable
+  moment to switch back), and WebView2's own print preview (the issue asks
+  for the system dialog).
 
 ## Packaging and distribution
 

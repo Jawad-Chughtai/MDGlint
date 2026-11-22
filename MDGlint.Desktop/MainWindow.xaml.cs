@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using MDGlint.Core.Models;
@@ -117,6 +118,7 @@ public partial class MainWindow : Window
                 PreviewBrowser.CoreWebView2,
                 Path.Combine(AppContext.BaseDirectory, "Assets"),
                 OpenMarkdownFile);
+            _preview.PrintInLightTheme = _settings.PrintInLightTheme;
             _preview.Ready += async (_, _) =>
             {
                 _shownFilePath = null; // A freshly loaded page shows nothing yet.
@@ -251,6 +253,9 @@ public partial class MainWindow : Window
 
     private void MoreButton_Click(object sender, RoutedEventArgs e)
     {
+        PrintMenuItem.IsEnabled = CanPrint;
+        ExportMenuItem.IsEnabled = CanPrint;
+        PrintLightMenuItem.IsChecked = _settings.PrintInLightTheme;
         AutoUpdateMenuItem.IsChecked = _updates.AutomaticChecks;
         CheckNowMenuItem.IsEnabled = !_updates.IsBusy;
         var menu = MoreButton.ContextMenu;
@@ -262,6 +267,77 @@ public partial class MainWindow : Window
             new CustomPopupPlacement(new Point(targetSize.Width - popupSize.Width, targetSize.Height), PopupPrimaryAxis.Horizontal),
         ];
         menu.IsOpen = true;
+    }
+
+    /// <summary>A file is shown (not the no-file page or a "File not found" message).</summary>
+    private bool CanPrint => _preview is not null && _shownFilePath is not null && File.Exists(_shownFilePath);
+
+    private void PrintMenuItem_Click(object sender, RoutedEventArgs e) => Print();
+
+    private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        // Also over the preview, where WebView2 would otherwise show its own print preview.
+        if (e.Key == Key.P && Keyboard.Modifiers == ModifierKeys.Control)
+        {
+            e.Handled = true;
+            Print();
+        }
+    }
+
+    private void Print()
+    {
+        if (CanPrint)
+        {
+            _preview!.ShowPrintDialog();
+        }
+    }
+
+    private async void ExportPdfMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        if (!CanPrint)
+        {
+            return;
+        }
+
+        var shown = _shownFilePath!;
+        var dialog = new SaveFileDialog
+        {
+            Filter = "PDF files (*.pdf)|*.pdf",
+            Title = "Export to PDF",
+            FileName = ExportFiles.SuggestedName(shown, ".pdf"),
+            InitialDirectory = ExportFiles.SuggestedFolder(shown),
+        };
+        if (dialog.ShowDialog(this) != true)
+        {
+            return;
+        }
+
+        bool saved;
+        try
+        {
+            saved = await _preview!.PrintToPdfAsync(dialog.FileName);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or COMException)
+        {
+            saved = false;
+        }
+
+        if (!saved)
+        {
+            MessageBox.Show(this, $"MDGlint couldn't save {dialog.FileName}.", "Export to PDF",
+                MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void PrintLightMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        _settings.PrintInLightTheme = PrintLightMenuItem.IsChecked;
+        _settingsStore.Save(_settings);
+        if (_preview is not null)
+        {
+            _preview.PrintInLightTheme = _settings.PrintInLightTheme;
+            _preview.SetTheme(_themeService.Theme);
+        }
     }
 
     private void AutoUpdateMenuItem_Click(object sender, RoutedEventArgs e)

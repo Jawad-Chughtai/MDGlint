@@ -4,9 +4,11 @@
 //
 // Host -> page:
 //   { type: "render", html: "<p>...</p>", base: "https://doc.mdglint.example/C/docs/" | null,
-//     theme: "light" | "dark", resetScroll: true | false, offersOpen: true | false }
+//     theme: "light" | "dark", resetScroll: true | false, offersOpen: true | false,
+//     printLight: true | false }
 //     offersOpen is true only for the no-file page, which then gets the shell's Open button.
-//   { type: "theme", theme: "light" | "dark" }
+//     printLight prints (and exports PDFs) in the light theme whatever the window shows.
+//   { type: "theme", theme: "light" | "dark", printLight: true | false }
 // Page -> host:
 //   { type: "ready" } once the page has loaded (again after any reload).
 //   { type: "drop" } with the dropped File objects, when files are dropped on the preview.
@@ -21,6 +23,10 @@
   const base = document.getElementById('mdglint-base');
   const markdownThemeLink = document.getElementById('mdglint-markdown-theme');
   const codeThemeLink = document.getElementById('mdglint-code-theme');
+  const printLinks = [
+    document.getElementById('mdglint-print-markdown-theme'),
+    document.getElementById('mdglint-print-code-theme')
+  ];
   // Taken from the shell before any content arrives, so only this element can ask for the dialog.
   const openPrompt = document.getElementById('mdglint-open-prompt').content.firstElementChild.cloneNode(true);
 
@@ -36,16 +42,23 @@
     }
   }
 
-  function applyTheme(theme) {
+  function applyTheme(theme, printLight) {
     const urls = preview.themeUrls(location.origin, theme);
+    const print = preview.printPlan(urls.name, printLight);
     setHref(markdownThemeLink, urls.markdown);
     setHref(codeThemeLink, urls.code);
+    markdownThemeLink.media = print.screenMedia;
+    codeThemeLink.media = print.screenMedia;
+    for (const link of printLinks) {
+      link.media = print.printMedia;
+    }
     document.documentElement.dataset.theme = urls.name;
+    document.documentElement.dataset.printTheme = print.printTheme;
   }
 
   function render(message) {
     const update = preview.readRender(message);
-    applyTheme(update.theme);
+    applyTheme(update.theme, update.printLight);
 
     const anchor = update.resetScroll
       ? null
@@ -109,7 +122,7 @@
         render(event.data);
         break;
       case 'theme':
-        applyTheme(event.data.theme);
+        applyTheme(event.data.theme, event.data.printLight === true);
         break;
     }
   });

@@ -13,6 +13,12 @@ public sealed class AppSettings
     public bool AllowRemoteContent { get; set; }
 
     /// <summary>
+    /// Print and export to PDF in the light theme, whatever the window shows. On by default, which
+    /// also applies to settings files written before 1.1, which don't have it.
+    /// </summary>
+    public bool PrintInLightTheme { get; set; } = true;
+
+    /// <summary>
     /// The user's in-app choice about checking for updates; null until they make one, when the
     /// choice made in setup applies (see <see cref="UpdatePreference"/>).
     /// </summary>

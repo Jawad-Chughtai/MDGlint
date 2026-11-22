@@ -36,7 +36,17 @@ public sealed class AppSettingsTests
 
         Assert.Equal("light", settings.Theme);
         Assert.False(settings.AllowRemoteContent);
+        Assert.True(settings.PrintInLightTheme);
         Assert.Null(settings.CheckForUpdates);
+    }
+
+    [Fact]
+    public void Deserialize_PrintsInLightThemeForFilesWrittenBeforeTheSetting()
+    {
+        var settings = AppSettingsSerializer.Deserialize("""{"Theme":"dark","AllowRemoteContent":true}""");
+
+        Assert.Equal("dark", settings.Theme);
+        Assert.True(settings.PrintInLightTheme);
     }
 
     [Fact]

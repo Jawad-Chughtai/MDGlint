@@ -269,6 +269,12 @@ internal sealed class AppSession : IAsyncDisposable
     public async Task<AutomationElement> MenuItemAsync(string name)
     {
         await InvokeAsync("MoreButton");
+        return await OpenMenuItemAsync(name);
+    }
+
+    /// <summary>An item of a menu that is already open, such as a submenu's.</summary>
+    public async Task<AutomationElement> OpenMenuItemAsync(string name)
+    {
         var condition = new AndCondition(
             new PropertyCondition(AutomationElement.ProcessIdProperty, Process.Id),
             new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.MenuItem),

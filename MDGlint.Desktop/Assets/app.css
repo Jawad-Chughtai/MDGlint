@@ -79,3 +79,28 @@ html[data-theme="dark"] .markdown-body .open-prompt button:hover {
   padding: 0;
   background: transparent;
 }
+
+/*
+  Printing and PDF export. The page's margins come from the print settings, and app.js sets
+  data-print-theme to the theme the printout uses; with the light one while the window is dark,
+  these undo the dark rules above (the print stylesheet links in index.html do the same for the
+  Markdown and code themes).
+*/
+@media print {
+  .markdown-body {
+    max-width: none;
+    padding: 0;
+  }
+
+  html[data-print-theme="light"] {
+    color-scheme: light;
+  }
+
+  html[data-print-theme="light"] body {
+    background-color: #ffffff;
+  }
+
+  html[data-print-theme="light"] .markdown-body .message {
+    color: #59636e;
+  }
+}
