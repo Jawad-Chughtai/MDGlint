@@ -108,7 +108,8 @@ public sealed class PreviewHost
             @base = document.BaseDirectory is null ? null : DocumentUrls.ToFolderUrl(document.BaseDirectory),
             theme = theme.ToStorageValue(),
             resetScroll = isNewDocument,
-            offersOpen = document.OffersOpen
+            offersOpen = document.OffersOpen,
+            printLight = PrintInLightTheme
         });
     }
 
@@ -123,12 +124,33 @@ public sealed class PreviewHost
         _core.Navigate(PreviewPolicy.ShellUrl);
     }
 
+    /// <summary>
+    /// Whether printing and PDF export use the light theme whatever the window shows. Takes effect
+    /// on the next <see cref="Show"/> or <see cref="SetTheme"/>.
+    /// </summary>
+    public bool PrintInLightTheme { get; set; } = true;
+
     public void SetTheme(ThemeKind theme)
     {
         if (_isReady)
         {
-            Post(new { type = "theme", theme = theme.ToStorageValue() });
+            Post(new { type = "theme", theme = theme.ToStorageValue(), printLight = PrintInLightTheme });
         }
+    }
+
+    /// <summary>Prints the shown file through the system print dialog.</summary>
+    public void ShowPrintDialog() => _core.ShowPrintUI(CoreWebView2PrintDialogKind.System);
+
+    /// <summary>
+    /// Saves the shown file as a PDF, as it would print (backgrounds included, no browser header
+    /// or footer). Returns false if WebView2 couldn't write it.
+    /// </summary>
+    public Task<bool> PrintToPdfAsync(string path)
+    {
+        var settings = _core.Environment.CreatePrintSettings();
+        settings.ShouldPrintBackgrounds = true;
+        settings.ShouldPrintHeaderAndFooter = false;
+        return _core.PrintToPdfAsync(path, settings);
     }
 
     private void Post(object message) => _core.PostWebMessageAsJson(JsonSerializer.Serialize(message));

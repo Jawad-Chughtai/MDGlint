@@ -16,7 +16,20 @@ globalThis.MDGlintPreview = (() => {
       html: typeof message.html === 'string' ? message.html : '',
       base: typeof message.base === 'string' && message.base.length > 0 ? message.base : null,
       resetScroll: message.resetScroll === true,
-      offersOpen: message.offersOpen === true
+      offersOpen: message.offersOpen === true,
+      printLight: message.printLight === true
+    };
+  }
+
+  // How the theme's stylesheets apply when printing. With printLight and the dark theme, the dark
+  // stylesheets are for the screen only and the light ones apply to print (and PDF export);
+  // otherwise the shown theme applies to both, and the print links are switched off.
+  function printPlan(theme, printLight) {
+    const lightForPrint = printLight === true && theme === 'dark';
+    return {
+      screenMedia: lightForPrint ? 'screen' : 'all',
+      printMedia: lightForPrint ? 'print' : 'not all',
+      printTheme: lightForPrint || theme !== 'dark' ? 'light' : 'dark'
     };
   }
 
@@ -250,6 +263,7 @@ globalThis.MDGlintPreview = (() => {
     messageType,
     isFileDrag,
     readRender,
+    printPlan,
     themeUrls,
     localPathToUrl,
     rewriteLocalPaths,

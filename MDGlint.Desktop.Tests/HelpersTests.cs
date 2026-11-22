@@ -12,6 +12,22 @@ public sealed class HelpersTests : IDisposable
     public void Dispose() => Directory.Delete(_folder, recursive: true);
 
     [Theory]
+    [InlineData(@"C:\docs\notes.md", "notes.pdf")]
+    [InlineData(@"C:\docs\release.notes.markdown", "release.notes.pdf")]
+    [InlineData("readme.md", "readme.pdf")]
+    public void ExportFiles_SuggestsTheFilesName(string path, string expected)
+    {
+        Assert.Equal(expected, ExportFiles.SuggestedName(path, ".pdf"));
+    }
+
+    [Fact]
+    public void ExportFiles_SuggestsTheFilesFolder()
+    {
+        Assert.Equal(@"C:\docs", ExportFiles.SuggestedFolder(@"C:\docs\notes.md"));
+        Assert.Equal(Path.GetFullPath("."), ExportFiles.SuggestedFolder("readme.md"));
+    }
+
+    [Theory]
     [InlineData("a.md", true)]
     [InlineData("A.MD", true)]
     [InlineData(@"C:\x\notes.markdown", true)]

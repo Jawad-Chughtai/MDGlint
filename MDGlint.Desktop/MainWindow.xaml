@@ -11,7 +11,8 @@
         AllowDrop="True"
         Background="#ffffff"
         DragOver="Window_DragOver"
-        Drop="Window_Drop">
+        Drop="Window_Drop"
+        PreviewKeyDown="Window_PreviewKeyDown">
 
     <Window.Resources>
         <SolidColorBrush x:Key="ToolbarForegroundBrush" Color="#1F2328" />
@@ -162,6 +163,20 @@
                     </StackPanel>
                     <Button.ContextMenu>
                         <ContextMenu>
+                            <MenuItem x:Name="PrintMenuItem"
+                                      Header="Print…"
+                                      InputGestureText="Ctrl+P"
+                                      Click="PrintMenuItem_Click" />
+                            <MenuItem x:Name="ExportMenuItem" Header="Export">
+                                <MenuItem x:Name="ExportPdfMenuItem"
+                                          Header="PDF…"
+                                          Click="ExportPdfMenuItem_Click" />
+                            </MenuItem>
+                            <MenuItem x:Name="PrintLightMenuItem"
+                                      Header="Print in light theme"
+                                      IsCheckable="True"
+                                      Click="PrintLightMenuItem_Click" />
+                            <Separator />
                             <MenuItem x:Name="AutoUpdateMenuItem"
                                       Header="Check for updates automatically"
                                       IsCheckable="True"

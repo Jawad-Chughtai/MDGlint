@@ -11,6 +11,10 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - An **Open…** button on the page shown when no file is open, with a line saying a Markdown file
   can be dropped there (#18).
+- **Print…** in the **⋯** menu, also with Ctrl+P, through the system print dialog (#14).
+- **Export ▸ PDF…** in the **⋯** menu, saved beside the open file by default (#12).
+- **Print in light theme** in the **⋯** menu, on by default: printouts and PDFs use the light
+  theme while the window shows the dark one.
 
 ## [1.0.0] - 2026-11-22
 
