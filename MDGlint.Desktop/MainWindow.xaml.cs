@@ -58,7 +58,8 @@ public partial class MainWindow : Window
             _settings,
             UpdateLauncher.ReadSetupChoice(),
             AppPaths.UpdatesFolder,
-            UpdateLauncher.StartInstaller);
+            // Setup opens MDGlint again with no file; the note tells that start which file was open.
+            ReopenNote.Around(UpdateLauncher.StartInstaller, AppPaths.ReopenNoteFile, () => _currentFilePath));
         _updates.StateChanged += (_, _) => ShowUpdateState();
         // Setup replaces MDGlint's files, so MDGlint closes; setup opens it again when it's done.
         _updates.ShutdownRequested += (_, _) => Application.Current.Shutdown();

@@ -184,6 +184,16 @@
   contacts anyone. AngleSharp, already shipped for HtmlSanitizer, does the
   HTML work, so no new library is needed. Rejected: linking remote images,
   which would load them from the internet whenever the file is opened.
+- **2026-11-22: Reopening the file after an update (#16) is the app's
+  job.** Before starting setup, MDGlint writes the open file's path to
+  `%LOCALAPPDATA%\MDGlint\reopen.txt`; the next start deletes the note and,
+  with no file given, opens the path if the note is at most five minutes
+  old and the file still exists. Setup doesn't change, so an installer
+  already out there keeps working, and only updates started from 1.1 on
+  reopen the file. The age limit keeps a note left by an update that never
+  finished from opening a file days later. Rejected: passing the file to
+  setup for its `[Run]` entry, which needs a setup change and puts a path
+  on setup's command line.
 
 ## Packaging and distribution
 

@@ -23,7 +23,7 @@ public static class AppPaths
     /// <summary><c>%APPDATA%\MDGlint</c>: settings.</summary>
     public static string RoamingFolder => Folders.Roaming;
 
-    /// <summary><c>%LOCALAPPDATA%\MDGlint</c>: WebView2 data, downloaded updates, the error log.</summary>
+    /// <summary><c>%LOCALAPPDATA%\MDGlint</c>: WebView2 data, downloaded updates, the error log, the reopen note.</summary>
     public static string LocalFolder => Folders.Local;
 
     public static string SettingsFile => Path.Combine(RoamingFolder, "settings.json");
@@ -33,6 +33,9 @@ public static class AppPaths
     public static string UpdatesFolder => Path.Combine(LocalFolder, "Updates");
 
     public static string ErrorLogFile => Path.Combine(LocalFolder, "startup-error.txt");
+
+    /// <summary>The file to open again after an update (<see cref="ReopenNote"/>).</summary>
+    public static string ReopenNoteFile => Path.Combine(LocalFolder, "reopen.txt");
 
     internal static (string Roaming, string Local) Resolve(string? overrideFolder, string appData, string localAppData) =>
         string.IsNullOrWhiteSpace(overrideFolder)

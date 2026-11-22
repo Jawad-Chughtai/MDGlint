@@ -93,7 +93,8 @@ Where things live. Keep this current when files are added, moved, or removed.
 | `Services/UpdateLauncher.cs` | Setup's update-check choice from the registry, the download folder, running the installer, the HTTP client (and the Debug update-server redirect) |
 | `Services/ExportImages.cs` | Export ▸ HTML's images as `data:` URLs: local ones the preview may load, remote ones only when allowed for the file |
 | `Services/LeftoverPreview.cs` | Finds, and on request ends, a WebView2 browser process a closed window left holding MDGlint's data folder |
-| `Helpers/AppPaths.cs` | Where settings, WebView2 data, downloads and the error log go (and the Debug data-folder hook) |
+| `Helpers/AppPaths.cs` | Where settings, WebView2 data, downloads, the error log and the reopen note go (and the Debug data-folder hook) |
+| `Helpers/ReopenNote.cs` | Notes the open file before setup starts; the next start opens it if the note is fresh |
 | `Helpers/BrowserArguments.cs` | Extra WebView2 browser arguments; only the Debug hook sets any (the end-to-end tests' DevTools port) |
 | `Helpers/DocumentUrls.cs` | Local path ↔ `https://doc.mdglint.example/C/...` URL mapping |
 | `Helpers/ErrorLog.cs` | Saves unhandled-error details; the error dialog's text |
@@ -122,6 +123,7 @@ Where things live. Keep this current when files are added, moved, or removed.
 | `PreviewPolicyTests.cs` | Shell page, local media types, remote blocking, messages, link actions |
 | `HelpersTests.cs` | `MarkdownFiles`, `ExportFiles`, `AppPaths`, `ProcessLauncher`, `ErrorLog`, `FileMarkdownReader`, `BrowserArguments` |
 | `ServicesTests.cs` | `AppSettingsStore`, `UpdateLauncher` (registry, downloads, starting setup, HTTP client) |
+| `ReopenNoteTests.cs` | `ReopenNote` (writing the note, a fresh, old, unreadable or pointless one, setup not starting) |
 | `ExportTests.cs` | `ExportImages` (local, remote, refused and failed images) and `ExportStyles` |
 | `FileWatcherServiceTests.cs` | Saves, renames, deletes, debouncing, stopping, the window's thread |
 | `WindowPlacementTests.cs` | Default maximized, restoring and fitting saved bounds, what closing saves |
@@ -140,4 +142,4 @@ Where things live. Keep this current when files are added, moved, or removed.
 | `CopyTests.cs` | A code block's Copy button, Copy Markdown |
 | `HtmlExportTests.cs` | Export ▸ HTML: one self-contained page, highlighted, remote images only once allowed |
 | `WindowTests.cs` | Theme, remote content, opening maximized and where it was left, the WebView2-missing notice, ending a leftover preview process |
-| `UpdateFlowTests.cs` | Opt-in respected, install only on request, hash mismatch, the ⋯ menu |
+| `UpdateFlowTests.cs` | Opt-in respected, install only on request, reopening the file after an update, hash mismatch, the ⋯ menu |

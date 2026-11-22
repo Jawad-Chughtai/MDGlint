@@ -65,6 +65,7 @@ public sealed class HelpersTests : IDisposable
         Assert.Equal(Path.Combine(AppPaths.LocalFolder, "WebView2"), AppPaths.WebView2Folder);
         Assert.Equal(Path.Combine(AppPaths.LocalFolder, "Updates"), AppPaths.UpdatesFolder);
         Assert.Equal(Path.Combine(AppPaths.LocalFolder, "startup-error.txt"), AppPaths.ErrorLogFile);
+        Assert.Equal(Path.Combine(AppPaths.LocalFolder, "reopen.txt"), AppPaths.ReopenNoteFile);
     }
 
     [Fact]

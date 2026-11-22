@@ -101,6 +101,7 @@ keeps its crash reports on your PC. See [SECURITY.md](SECURITY.md).
 | Settings (theme, remote content, update checks, window size) | `%APPDATA%\MDGlint\settings.json` |
 | WebView2 cache and crash reports | `%LOCALAPPDATA%\MDGlint\WebView2\` |
 | A downloaded update, until the next start | `%LOCALAPPDATA%\MDGlint\Updates\` |
+| The file to reopen after an update, until the next start | `%LOCALAPPDATA%\MDGlint\reopen.txt` |
 | Startup error log | `%LOCALAPPDATA%\MDGlint\startup-error.txt` |
 
 Uninstalling removes the program and file association, then asks whether to keep your settings.

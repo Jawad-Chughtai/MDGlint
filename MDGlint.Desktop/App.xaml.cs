@@ -14,7 +14,9 @@ public partial class App : Application
         DispatcherUnhandledException += OnDispatcherUnhandledException;
         base.OnStartup(e);
 
-        var filePath = e.Args.Length > 0 ? e.Args[0] : null;
+        // Every start takes the note an update leaves; only a start with no file opens it.
+        var reopen = ReopenNote.Take(AppPaths.ReopenNoteFile, DateTime.UtcNow);
+        var filePath = e.Args.Length > 0 ? e.Args[0] : reopen;
         var window = new MainWindow(filePath);
         window.Show();
     }

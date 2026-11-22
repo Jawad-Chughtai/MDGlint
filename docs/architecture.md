@@ -191,6 +191,12 @@ mismatch deletes it. `UpdateLauncher.StartInstaller` runs the still-locked file 
 the app shuts down. Setup's `[Run]` entry opens MDGlint again when `/UPDATE=1` is passed, as
 the user who started setup. The next start deletes the `Updates` folder.
 
+Setup opens MDGlint with no file, so just before it starts setup `ReopenNote` writes the open
+file's path to `%LOCALAPPDATA%\MDGlint\reopen.txt` (nothing when no file is open), and removes
+it again if setup didn't start. Every start takes the note (`App.OnStartup`): it deletes it,
+and a start with no file opens the path it names if the note is at most five minutes old and
+the file is still there. Setup itself doesn't change.
+
 ## Settings and the window
 
 Settings are read and written by `AppSettingsSerializer` (Core), which gives defaults for a
@@ -213,6 +219,7 @@ device-independent pixels; closing while minimized keeps the previous maximized 
 | Settings | `%APPDATA%\MDGlint\settings.json` | `AppSettingsStore` |
 | Setup's update-check choice | `Software\MDGlint\CheckForUpdates` in `HKCU` or `HKLM` | Setup |
 | A downloaded update | `%LOCALAPPDATA%\MDGlint\Updates\` (deleted at the next start) | `UpdateService` |
+| The file to reopen after an update | `%LOCALAPPDATA%\MDGlint\reopen.txt` (deleted at the next start) | `ReopenNote` |
 | WebView2 profile, cache and crash reports | `%LOCALAPPDATA%\MDGlint\WebView2\` | WebView2 |
 | Unhandled error details | `%LOCALAPPDATA%\MDGlint\startup-error.txt` | `App.OnDispatcherUnhandledException` (`ErrorLog`) |
 
