@@ -85,10 +85,17 @@ They check that a file's scripts never run (sanitizer and CSP), local images loa
 files don't, links go to the browser, Explorer or MDGlint and script-started navigation goes
 nowhere, `#` links jump, the reader keeps their place when the file is saved, a Markdown file dropped on
 the preview opens and others are ignored, the theme switches and is remembered, the window opens
-maximized and then as it was left, remote content is blocked until allowed in each way the window offers, the
-WebView2-missing notice shows, and the update bar: no request unless the user opted in,
-**Install** only on request, a verified installer started with the right arguments, a hash
-mismatch refused, **Check for updates now** and the automatic-check toggle.
+maximized and then as it was left, remote content is blocked until allowed in each way the
+window offers, the WebView2-missing notice shows, and a preview process left by a closed window
+is reported and ended. Print, Export and Copy are offered only while a file is shown; printouts
+use the light theme until that is turned off, with MDGlint's footer on every page and no
+browser header or footer; the PDF is saved beside the file; the HTML export is self-contained
+and the Word export is a valid document with its headings, list, table, code, footnote
+and link; a code block and the whole file's Markdown are copied. And the
+update bar: no request unless the user opted in, **Install** only on request, a verified
+installer started with the right arguments, a hash mismatch refused, a release without a hash
+offered only as a link, betas only when turned on, the file reopened after an update,
+**Check for updates now** and the automatic-check toggle.
 
 A failed wait prints what the page showed (`DevTools.DescribeAsync`).
 
