@@ -41,11 +41,6 @@ Also in 1.1 (the first two come from testing 1.0.0 on a clean PC):
   `releases/latest`; record the new choice there. Copies older than 1.1 can't see betas, so
   the first one is downloaded by hand.
 
-If it fits (otherwise a later release):
-
-- **App design** (#19): a redesigned toolbar and overall look, possibly with a status bar at the
-  bottom.
-
 ## 1.2 — Quick inline edits
 
 Milestone: [1.2 Quick inline edits](https://github.com/Jawad-Chughtai/MDGlint/milestone/2)
@@ -56,6 +51,11 @@ Fix a typo or change a couple of lines without switching apps.
 - Save back to the same file (#21) with the original encoding and line endings preserved; warn if the
   file changed on disk meanwhile.
 - Undo (#22), and a clear unsaved-changes indicator and prompt on close.
+
+Also in 1.2:
+
+- **App design** (#19): a redesigned toolbar and overall look. Three directions are mocked up in
+  `docs/design/` (a quiet reading page, a dark workbench, a command bar); pick one first.
 
 ## 1.3 — Diagrams and rich content
 

@@ -24,6 +24,11 @@
   clear meaning with several windows open. 1.1 should be a stable release,
   so #17 waits for its own design (`roadmap.md`, Exploring). The issue
   stays open with no milestone.
+- **2026-11-22: The app design (#19) moves to 1.2.** 1.1 already brings
+  export, print, copy and beta updates; a new look on top would make it too
+  big to test in a week. The redesign changes nothing users rely on, so it
+  stays a minor release rather than a 2.0. Three directions were mocked up
+  and are kept in `docs/design/` for the choice.
 - **Open source, MIT.** Published on GitHub so anyone can use it. MIT keeps
   reuse simple and matches the dependencies' permissive licenses.
 - **GitHub-inspired look, own stylesheets.** *(Superseded 2026-11-19 by

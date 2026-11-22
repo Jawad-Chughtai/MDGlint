@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MDGlint mock-up: Command bar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#3730A3}
+</style>
+</head>
+<body>
+<div style="width: 1280px; height: 800px; box-sizing: border-box; background: #EEF1F6; font-family: Geist, Inter, sans-serif; color: #111827; position: relative; overflow: hidden; border: 1px solid #D5DAE3">
+
+  <header style="height: 48px; display: flex; align-items: center; gap: 10px; padding-left: 14px; background: #E6EAF1">
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="1.5" width="12" height="13" rx="2.5" fill="#4F46E5"></rect><path d="M5 10V6l1.5 2L8 6v4M10.5 6v4M9.5 9l1 1 1-1" fill="none" stroke="#FFFFFF" stroke-width="1.1"></path></svg>
+    <button style="border: 0; background: transparent; display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-radius: 6px; font: 500 13px Geist, sans-serif; color: #111827; cursor: pointer">field-notes.md <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5l3 3 3-3" fill="none" stroke="#6B7280" stroke-width="1.3"></path></svg></button>
+    <span style="flex-grow: 1"></span>
+    <button style="width: 460px; height: 32px; display: flex; align-items: center; gap: 10px; padding: 0 10px 0 12px; border: 1px solid #D5DAE3; border-radius: 8px; background: #FFFFFF; font: 13px Geist, sans-serif; color: #6B7280; cursor: pointer">
+      <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="none" stroke="#6B7280" stroke-width="1.4"></circle><path d="M10.5 10.5L14 14" stroke="#6B7280" stroke-width="1.4" stroke-linecap="round"></path></svg>
+      Search in file or type a command
+      <span style="flex-grow: 1"></span>
+      <kbd style="font: 500 11px Geist, sans-serif; color: #4B5563; background: #F3F4F6; border: 1px solid #E5E7EB; border-radius: 4px; padding: 1px 6px">Ctrl K</kbd>
+    </button>
+    <span style="flex-grow: 1"></span>
+    <button aria-label="Switch to dark theme" style="border: 0; background: transparent; width: 34px; height: 32px; border-radius: 6px; cursor: pointer"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M13 9.5A5.5 5.5 0 0 1 6.5 3a5.5 5.5 0 1 0 6.5 6.5z" fill="none" stroke="#374151" stroke-width="1.3" stroke-linejoin="round"></path></svg></button>
+    <button aria-label="Export" style="border: 0; background: transparent; width: 34px; height: 32px; border-radius: 6px; cursor: pointer"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8M5 7l3 3 3-3M3 12v2h10v-2" fill="none" stroke="#374151" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+    <button aria-label="More" style="border: 0; background: transparent; width: 34px; height: 32px; border-radius: 6px; cursor: pointer"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="3.5" cy="8" r="1.2" fill="#374151"></circle><circle cx="8" cy="8" r="1.2" fill="#374151"></circle><circle cx="12.5" cy="8" r="1.2" fill="#374151"></circle></svg></button>
+    <div style="display: flex; height: 48px; margin-left: 6px" aria-hidden="true">
+      <span style="width: 46px; display: flex; align-items: center; justify-content: center"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M0 5h10" stroke="#374151"></path></svg></span>
+      <span style="width: 46px; display: flex; align-items: center; justify-content: center"><svg width="10" height="10" viewBox="0 0 10 10"><rect x="0.5" y="0.5" width="9" height="9" fill="none" stroke="#374151"></rect></svg></span>
+      <span style="width: 46px; display: flex; align-items: center; justify-content: center"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M0 0l10 10M10 0L0 10" stroke="#374151"></path></svg></span>
+    </div>
+  </header>
+
+  <main style="position: absolute; left: 50%; top: 68px; transform: translateX(-50%); width: 860px; height: 760px; background: #FFFFFF; border-radius: 14px; box-shadow: 0 1px 2px rgba(15,23,42,0.06), 0 8px 24px rgba(15,23,42,0.06); padding: 48px 72px; box-sizing: border-box">
+    <h1 style="margin: 0 0 14px; font-size: 34px; font-weight: 700; letter-spacing: -0.02em">Field notes</h1>
+    <p style="margin: 0 0 20px; font-size: 16px; line-height: 1.65; color: #374151">A short guide to the weekend birding trip. Everything here renders the way GitHub shows it.</p>
+    <div style="margin: 0 0 24px; padding: 10px 16px; border-left: 3px solid #16A34A; background: #F0FDF4; border-radius: 0 8px 8px 0; font-size: 15px; line-height: 1.6; color: #14532D"><b>Tip</b> · Bring binoculars and a notebook. The morning walk starts at <b>6:30</b> sharp.</div>
+    <h2 style="margin: 0 0 12px; font-size: 22px; font-weight: 600">Sightings so far</h2>
+    <table style="border-collapse: collapse; font-size: 14px; margin-bottom: 24px; width: 460px">
+      <thead><tr style="text-align: left; background: #F8FAFC"><th style="padding: 8px 12px; border-bottom: 1px solid #E5E7EB; font-weight: 600">Species</th><th style="padding: 8px 12px; border-bottom: 1px solid #E5E7EB; font-weight: 600">Where</th><th style="padding: 8px 12px; border-bottom: 1px solid #E5E7EB; font-weight: 600; text-align: right">Count</th></tr></thead>
+      <tbody>
+        <tr><td style="padding: 8px 12px; border-bottom: 1px solid #F1F5F9">Grey heron</td><td style="padding: 8px 12px; border-bottom: 1px solid #F1F5F9">Reed lake</td><td style="padding: 8px 12px; border-bottom: 1px solid #F1F5F9; text-align: right">3</td></tr>
+        <tr><td style="padding: 8px 12px; border-bottom: 1px solid #F1F5F9">Kingfisher</td><td style="padding: 8px 12px; border-bottom: 1px solid #F1F5F9">River bend</td><td style="padding: 8px 12px; border-bottom: 1px solid #F1F5F9; text-align: right">1</td></tr>
+        <tr><td style="padding: 8px 12px">Great tit</td><td style="padding: 8px 12px">Forest edge</td><td style="padding: 8px 12px; text-align: right">12</td></tr>
+      </tbody>
+    </table>
+    <h2 style="margin: 0 0 12px; font-size: 22px; font-weight: 600">Tally script</h2>
+    <pre style="margin: 0; padding: 14px 16px; background: #F8FAFC; border: 1px solid #E5E7EB; border-radius: 8px; font: 13px/1.6 'JetBrains Mono', monospace; color: #1F2937"><span style="color: #9333EA">from</span> collections <span style="color: #9333EA">import</span> Counter
+
+<span style="color: #9333EA">def</span> <span style="color: #2563EB">tally</span>(sightings):</pre>
+  </main>
+
+  <div style="position: absolute; inset: 48px 0 0 0; background: rgba(15,23,42,0.28)"></div>
+
+  <div role="dialog" aria-label="Command palette" style="position: absolute; left: 50%; top: 120px; transform: translateX(-50%); width: 600px; background: #FFFFFF; border-radius: 14px; box-shadow: 0 24px 60px rgba(15,23,42,0.28); overflow: hidden; border: 1px solid #E5E7EB">
+    <div style="display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid #EEF0F3">
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="none" stroke="#6B7280" stroke-width="1.4"></circle><path d="M10.5 10.5L14 14" stroke="#6B7280" stroke-width="1.4" stroke-linecap="round"></path></svg>
+      <span style="font-size: 16px; color: #111827">exp<span style="display: inline-block; width: 1px; height: 18px; background: #4F46E5; vertical-align: -3px; margin-left: 1px"></span></span>
+      <span style="flex-grow: 1"></span>
+      <kbd style="font: 500 11px Geist, sans-serif; color: #4B5563; background: #F3F4F6; border: 1px solid #E5E7EB; border-radius: 4px; padding: 1px 6px">Esc</kbd>
+    </div>
+    <div style="padding: 8px">
+      <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.06em; color: #9CA3AF; padding: 8px 10px 6px">COMMANDS</div>
+      <button style="width: 100%; border: 0; display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 8px; background: #EEF2FF; font: 14px Geist, sans-serif; color: #111827; text-align: left; cursor: pointer"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8M5 7l3 3 3-3M3 12v2h10v-2" fill="none" stroke="#4F46E5" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"></path></svg><span><b>Exp</b>ort to PDF</span><span style="flex-grow: 1"></span><span style="font-size: 12px; color: #6B7280">Enter</span></button>
+      <button style="width: 100%; border: 0; display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 8px; background: transparent; font: 14px Geist, sans-serif; color: #111827; text-align: left; cursor: pointer"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8M5 7l3 3 3-3M3 12v2h10v-2" fill="none" stroke="#6B7280" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"></path></svg><span><b>Exp</b>ort to HTML</span></button>
+      <button style="width: 100%; border: 0; display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 8px; background: transparent; font: 14px Geist, sans-serif; color: #111827; text-align: left; cursor: pointer"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8M5 7l3 3 3-3M3 12v2h10v-2" fill="none" stroke="#6B7280" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"></path></svg><span><b>Exp</b>ort to Word</span></button>
+      <button style="width: 100%; border: 0; display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 8px; background: transparent; font: 14px Geist, sans-serif; color: #111827; text-align: left; cursor: pointer"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6V2h8v4M4 11H2.5V6h11v5H12M4 9h8v5H4z" fill="none" stroke="#6B7280" stroke-width="1.3" stroke-linejoin="round"></path></svg><span>Print…</span><span style="flex-grow: 1"></span><span style="font-size: 12px; color: #6B7280">Ctrl+P</span></button>
+      <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.06em; color: #9CA3AF; padding: 12px 10px 6px">ALSO</div>
+      <button style="width: 100%; border: 0; display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 8px; background: transparent; font: 14px Geist, sans-serif; color: #111827; text-align: left; cursor: pointer"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="5" y="5" width="8.5" height="9" rx="1.5" fill="none" stroke="#6B7280" stroke-width="1.3"></rect><path d="M3 11V3.5A1.5 1.5 0 0 1 4.5 2H10" fill="none" stroke="#6B7280" stroke-width="1.3"></path></svg><span>Copy Markdown</span><span style="flex-grow: 1"></span><span style="font-size: 12px; color: #6B7280">Ctrl+Shift+C</span></button>
+      <button style="width: 100%; border: 0; display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 8px; background: transparent; font: 14px Geist, sans-serif; color: #111827; text-align: left; cursor: pointer"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M13 9.5A5.5 5.5 0 0 1 6.5 3a5.5 5.5 0 1 0 6.5 6.5z" fill="none" stroke="#6B7280" stroke-width="1.3" stroke-linejoin="round"></path></svg><span>Switch to dark theme</span></button>
+    </div>
+    <div style="display: flex; gap: 16px; padding: 10px 18px; border-top: 1px solid #EEF0F3; font-size: 12px; color: #6B7280; background: #FAFBFC"><span>↑↓ to move</span><span>Enter to run</span><span style="flex-grow: 1"></span><span>Headings in this file: type #</span></div>
+  </div>
+
+  <div role="status" style="position: absolute; right: 24px; bottom: 24px; display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #111827; color: #F9FAFB; border-radius: 10px; font-size: 13px; box-shadow: 0 10px 30px rgba(15,23,42,0.25)">
+    <span style="width: 8px; height: 8px; border-radius: 4px; background: #4F46E5"></span>Reloaded — file changed on disk
+  </div>
+</div>
+</body>
+</html>
