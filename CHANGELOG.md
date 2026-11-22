@@ -30,6 +30,8 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - When a closed MDGlint window has left its preview process running, a new window says so at
   once, instead of failing after a long wait, and offers **End it and try again**, which ends
   only that leftover process and starts the preview.
+- After an update, MDGlint opens again with the file that was open (#16). This works for
+  updates installed from this version on.
 
 ## [1.0.0] - 2026-11-22
 

@@ -71,6 +71,52 @@ public sealed class UpdateFlowTests
     }
 
     [EndToEndFact]
+    public async Task ReopensTheFileAfterAnUpdate()
+    {
+        using var github = FakeGitHub(NewVersion, Hash(Setup));
+        var docs = AppSession.NewFolder();
+        try
+        {
+            var file = Path.Combine(docs, "notes.md");
+            File.WriteAllText(file, "# Notes");
+
+            // Installing notes the open file just before setup starts.
+            string note;
+            await using (var app = await AppSession.StartAsync(file, new AppOptions
+            {
+                UpdateServer = github.Origin,
+                Settings = """{"CheckForUpdates":true}""",
+            }))
+            {
+                await app.WaitForTextAsync("UpdateBarText", t => t.Contains("is available"));
+                await app.InvokeAsync("UpdateInstallButton");
+                Assert.True(app.Process.WaitForExit(30_000), "MDGlint didn't close for setup.");
+                note = File.ReadAllText(Path.Combine(app.Folder, "data", "Local", "MDGlint", "reopen.txt"));
+            }
+
+            Assert.Equal(file, note);
+
+            // Setup opens MDGlint with no file: it opens the noted one, and takes the note.
+            string? local = null;
+            await using var reopened = await AppSession.StartAsync(null, new AppOptions
+            {
+                BeforeStart = folder =>
+                {
+                    local = Path.Combine(folder, "data", "Local", "MDGlint");
+                    Directory.CreateDirectory(local);
+                    File.WriteAllText(Path.Combine(local, "reopen.txt"), note);
+                },
+            });
+            await reopened.Page.WaitForAsync("document.querySelector('h1')?.textContent === 'Notes'", "The file wasn't reopened.");
+            Assert.False(File.Exists(Path.Combine(local!, "reopen.txt")));
+        }
+        finally
+        {
+            Directory.Delete(docs, recursive: true);
+        }
+    }
+
+    [EndToEndFact]
     public async Task RefusesAnInstallerThatDoesNotMatchItsHash()
     {
         using var github = FakeGitHub(NewVersion, Hash(RandomNumberGenerator.GetBytes(16)));
