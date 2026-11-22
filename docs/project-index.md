@@ -54,6 +54,11 @@ Where things live. Keep this current when files are added, moved, or removed.
 | `Services/AppSettingsSerializer.cs` | `settings.json` text to `AppSettings` and back, with defaults for missing or damaged files |
 | `Services/HtmlContentSanitizer.cs` | Allow-list sanitizer for the rendered HTML (HtmlSanitizer) |
 | `Services/HtmlExporter.cs` | Builds Export ▸ HTML's self-contained page: inlined styles, embedded images, no video or audio, a CSP that loads nothing |
+| `Services/DocxExporter.cs` | Builds Export ▸ Word's `.docx` from the preview's content: reads each image once (data URLs, or through the app), keeps only those Word can show |
+| `Services/DocxWriter.cs` | The preview's HTML to Word's body: headings in Word's styles, lists, tables, code blocks, quotes and alerts, links (web and mail only), stored images, footnotes |
+| `Services/DocxParts.cs` | The exported document's styles, list formats and settings |
+| `Services/ImageInfo.cs` | An image's type and pixel size from its header (PNG, JPEG, GIF, BMP) |
+| `Models/ExportImage.cs` | An exported image's content type and bytes |
 | `Services/MarkdownRenderer.cs` | Markdig pipeline; Markdown to an HTML fragment, sanitized, or a message fragment on failure |
 | `Services/RemoteContentPolicy.cs` | Remote-content choices (per file, always) and what counts as remote |
 | `Services/RenderPlan.cs` | For each render: new document or the same one saved, remote content allowed, hide the remote bar |
@@ -68,6 +73,8 @@ Where things live. Keep this current when files are added, moved, or removed.
 | `AppVersionTests.cs` | Version display text; built assemblies match `Directory.Build.props` |
 | `HtmlContentSanitizerTests.cs` | What the sanitizer keeps and removes |
 | `HtmlExporterTests.cs` | The exported page's head, theme and title, which images are embedded or left out |
+| `DocxExporterTests.cs` | Each exported Word document passes the Open XML SDK's schema check; styles, inline formatting, white space, links, lists, code, quotes, tables, images and their sizes, footnotes |
+| `ImageInfoTests.cs` | Image headers read and refused |
 | `PreviewUnavailableNoticeTests.cs` | The WebView2 notices' texts, link and actions, and which one each case gets |
 | `MarkdownRendererTests.cs` | Rendering, sanitizing, file read failures and messages |
 | `RemoteContentPolicyTests.cs` | Remote-content choices and remote-address detection |
@@ -84,14 +91,14 @@ Where things live. Keep this current when files are added, moved, or removed.
 | Path | What |
 |---|---|
 | `App.xaml(.cs)` | Startup, command-line file argument, unhandled-error dialog and log |
-| `MainWindow.xaml(.cs)` | Toolbar (version, Open, Reload, Remote, theme, ⋯ menu with Print, Export (HTML, PDF), Copy Markdown, the print-theme choice and update options), Ctrl+P, Ctrl+Shift+C, remote-content bar, update bar, WebView2 setup (crash reports kept local) and the notice when it can't start, drag and drop on the toolbar, window placement, theme chrome |
+| `MainWindow.xaml(.cs)` | Toolbar (version, Open, Reload, Remote, theme, ⋯ menu with Print, Export (HTML, PDF, Word), Copy Markdown, the print-theme choice and update options), Ctrl+P, Ctrl+Shift+C, remote-content bar, update bar, WebView2 setup (crash reports kept local) and the notice when it can't start, drag and drop on the toolbar, window placement, theme chrome |
 | `AssemblyInfo.cs` | WPF theme info; internals visible to `MDGlint.Desktop.Tests` |
-| `Services/PreviewHost.cs` | Applies `PreviewPolicy` to WebView2: shell page, local file responses, remote-content blocking, render/theme messages (with the print theme), printing and PDF export, the shown content for HTML export, files dropped on the preview, the no-file page's Open request, navigation and links; SmartScreen off |
+| `Services/PreviewHost.cs` | Applies `PreviewPolicy` to WebView2: shell page, local file responses, remote-content blocking, render/theme messages (with the print theme), printing and PDF export, the shown content for HTML and Word export, files dropped on the preview, the no-file page's Open request, navigation and links; SmartScreen off |
 | `Services/FileMarkdownReader.cs` | `IMarkdownFileReader` over the file system |
 | `Services/AppSettingsStore.cs` | `ISettingsStore` as JSON in `%APPDATA%\MDGlint` |
 | `Services/FileWatcherService.cs` | Watches the open file; 250 ms debounced reload on the window's thread |
 | `Services/UpdateLauncher.cs` | Setup's update-check choice from the registry, the download folder, running the installer, the HTTP client (and the Debug update-server redirect) |
-| `Services/ExportImages.cs` | Export ▸ HTML's images as `data:` URLs: local ones the preview may load, remote ones only when allowed for the file |
+| `Services/ExportImages.cs` | Exported images, as bytes for Word or `data:` URLs for HTML: local ones the preview may load, remote ones only when allowed for the file |
 | `Services/LeftoverPreview.cs` | Finds, and on request ends, a WebView2 browser process a closed window left holding MDGlint's data folder |
 | `Helpers/AppPaths.cs` | Where settings, WebView2 data, downloads, the error log and the reopen note go (and the Debug data-folder hook) |
 | `Helpers/ReopenNote.cs` | Notes the open file before setup starts; the next start opens it if the note is fresh |
@@ -107,7 +114,7 @@ Where things live. Keep this current when files are added, moved, or removed.
 | `Helpers/WindowPlacement.cs` | Where the window opens (maximized by default, else its saved bounds fitted to the screen) and what it saves on closing |
 | `Assets/index.html` | Preview shell page: CSP, `<base>`, stylesheet links, scripts, the no-file page's Open prompt, the code blocks' Copy button |
 | `Assets/preview.js` | The page's decisions, tested in Node: messages, theme URLs, absolute-path rewriting, scroll anchoring, code highlighting, the text a Copy button copies and its label, `#anchor` targets, file drags |
-| `Assets/app.js` | Wires `preview.js` to the page: render in place, scroll, theme swap, `#anchor` clicks, dropped files to the app, the Open prompt on the no-file page, Copy buttons on code blocks, `mdglintExport()` for HTML export, the ready message |
+| `Assets/app.js` | Wires `preview.js` to the page: render in place, scroll, theme swap, `#anchor` clicks, dropped files to the app, the Open prompt on the no-file page, Copy buttons on code blocks, `mdglintExport()` for HTML and Word export, the ready message |
 | `Assets/app.css` | Page layout around the Markdown, colour scheme, code-block fixes, print rules (MDGlint's footer with the page number, no browser header or footer) |
 | `Assets/export.css` | The page layout of exported HTML files, in both themes |
 | `Assets/vendor/github-markdown-css/` | GitHub's Markdown styles, light and dark (MIT, with licence) |
@@ -141,5 +148,6 @@ Where things live. Keep this current when files are added, moved, or removed.
 | `PrintTests.cs` | The light print theme and turning it off, PDF export beside the file and its title, MDGlint's footer on every page and no browser header or footer, Print, Export and Copy Markdown only with a file open |
 | `CopyTests.cs` | A code block's Copy button, Copy Markdown |
 | `HtmlExportTests.cs` | Export ▸ HTML: one self-contained page, highlighted, remote images only once allowed |
+| `WordExportTests.cs` | Export ▸ Word: a valid `.docx` in Word's styles, sanitized, remote images only once allowed |
 | `WindowTests.cs` | Theme, remote content, opening maximized and where it was left, the WebView2-missing notice, ending a leftover preview process |
 | `UpdateFlowTests.cs` | Opt-in respected, install only on request, reopening the file after an update, beta versions, hash mismatch, the ⋯ menu |

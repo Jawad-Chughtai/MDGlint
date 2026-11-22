@@ -9,6 +9,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using DocumentFormat.OpenXml.Packaging;
 using MDGlint.Core.Models;
 using MDGlint.Core.Services;
 using MDGlint.Desktop.Helpers;
@@ -413,7 +414,28 @@ public partial class MainWindow : Window
     /// Saves the shown file as one self-contained HTML page in the current theme (HtmlExporter),
     /// with images embedded under the preview's rules (ExportImages).
     /// </summary>
-    private async void ExportHtmlMenuItem_Click(object sender, RoutedEventArgs e)
+    private void ExportHtmlMenuItem_Click(object sender, RoutedEventArgs e) =>
+        ExportContent("HTML", "HTML files (*.html)|*.html", ".html", async (content, shown, images, path) =>
+        {
+            var html = await HtmlExporter.BuildAsync(content, Path.GetFileName(shown), _themeService.Theme,
+                ExportStyles.For(Path.Combine(AppContext.BaseDirectory, "Assets"), _themeService.Theme), images.EmbedAsync);
+            await File.WriteAllTextAsync(path, html);
+        });
+
+    /// <summary>
+    /// Saves the shown file as a Word document in the light theme (DocxExporter), with images
+    /// stored in it under the preview's rules (ExportImages).
+    /// </summary>
+    private void ExportWordMenuItem_Click(object sender, RoutedEventArgs e) =>
+        ExportContent("Word", "Word documents (*.docx)|*.docx", ".docx", async (content, shown, images, path) =>
+        {
+            var document = await DocxExporter.BuildAsync(content, Path.GetFileName(shown), images.LoadAsync);
+            await File.WriteAllBytesAsync(path, document);
+        });
+
+    /// <summary>Asks where to save, then writes the preview's content there with <paramref name="write"/>.</summary>
+    private async void ExportContent(string format, string filter, string extension,
+        Func<string, string, ExportImages, string, Task> write)
     {
         if (!FileShown)
         {
@@ -423,9 +445,9 @@ public partial class MainWindow : Window
         var shown = _shownFilePath!;
         var dialog = new SaveFileDialog
         {
-            Filter = "HTML files (*.html)|*.html",
-            Title = "Export to HTML",
-            FileName = ExportFiles.SuggestedName(shown, ".html"),
+            Filter = filter,
+            Title = $"Export to {format}",
+            FileName = ExportFiles.SuggestedName(shown, extension),
             InitialDirectory = ExportFiles.SuggestedFolder(shown),
         };
         if (dialog.ShowDialog(this) != true)
@@ -440,16 +462,13 @@ public partial class MainWindow : Window
             var content = await _preview!.ExportContentAsync() ?? throw new InvalidOperationException("The preview isn't showing the file.");
             using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
             http.DefaultRequestHeaders.UserAgent.ParseAdd("MDGlint");
-            var images = new ExportImages(http, _remotePolicy.IsAllowed(shown));
-            var html = await HtmlExporter.BuildAsync(content, Path.GetFileName(shown), _themeService.Theme,
-                ExportStyles.For(Path.Combine(AppContext.BaseDirectory, "Assets"), _themeService.Theme), images.EmbedAsync);
-            await File.WriteAllTextAsync(dialog.FileName, html);
+            await write(content, shown, new ExportImages(http, _remotePolicy.IsAllowed(shown)), dialog.FileName);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or COMException
-            or InvalidOperationException or JsonException)
+            or InvalidOperationException or JsonException or ArgumentException or OpenXmlPackageException)
         {
             Mouse.OverrideCursor = null;
-            MessageBox.Show(this, $"MDGlint couldn't save {dialog.FileName}.", "Export to HTML",
+            MessageBox.Show(this, $"MDGlint couldn't save {dialog.FileName}.", $"Export to {format}",
                 MessageBoxButton.OK, MessageBoxImage.Error);
         }
         finally

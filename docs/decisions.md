@@ -184,6 +184,25 @@
   contacts anyone. AngleSharp, already shipped for HtmlSanitizer, does the
   HTML work, so no new library is needed. Rejected: linking remote images,
   which would load them from the internet whenever the file is opened.
+- **2026-11-22: Word export (#13) uses the Open XML SDK and starts from
+  the preview's HTML.** Microsoft's Open XML SDK (`DocumentFormat.OpenXml`,
+  MIT) writes the `.docx`; MDGlint's own `DocxWriter` turns the content into
+  Word's paragraphs, lists, tables and footnotes. The content is the same
+  sanitized HTML the HTML export takes from the preview, so raw HTML in the
+  file has already been cleaned and image addresses are already resolved,
+  and the document matches the screen. Images follow the same rules as the
+  HTML export and are stored in the document, never linked, since a linked
+  image would be fetched each time Word opens the file. Only web and mail
+  links stay links, and a `.docx` can't hold macros. The document is always
+  light: Word documents are mostly printed or sent on. Code keeps its font
+  and shading but not its syntax colours, for now. The SDK adds about 8 MB
+  to the app (its assemblies are part of the single-file exe), and .NET
+  loads them only when a Word export runs, so opening a file stays as fast.
+  Rejected: HtmlToOpenXml (MIT), less code but untrusted HTML handled by a
+  smaller third-party project; Pandoc, a separate GPL program and a large
+  download; Word automation, which needs Word installed; walking Markdig's
+  syntax tree, which would duplicate the preview's image paths and
+  sanitizing.
 - **2026-11-22: Reopening the file after an update (#16) is the app's
   job.** Before starting setup, MDGlint writes the open file's path to
   `%LOCALAPPDATA%\MDGlint\reopen.txt`; the next start deletes the note and,

@@ -28,6 +28,21 @@ public sealed class ExportTests : IDisposable
         Assert.Equal("data:image/png;base64,iVBORw==", await images.EmbedAsync(LocalUrl("a.png")));
     }
 
+    [Fact]
+    public async Task LoadsAnImagesBytesForWord()
+    {
+        File.WriteAllBytes(Path.Combine(_folder, "a.png"), Png);
+        var handler = new Handler { Respond = _ => Image(Png, "image/gif") };
+        var images = new ExportImages(new HttpClient(handler), allowRemoteContent: true);
+
+        var local = await images.LoadAsync(LocalUrl("a.png"));
+        Assert.Equal("image/png", local!.ContentType);
+        Assert.Equal(Png, local.Bytes);
+        var remote = await images.LoadAsync(new Uri("https://example.com/a.gif"));
+        Assert.Equal("image/gif", remote!.ContentType);
+        Assert.Equal(Png, remote.Bytes);
+    }
+
     [Theory]
     [InlineData("a.mp4")] // Video, not an image.
     [InlineData("a.txt")] // Never served to the preview.
