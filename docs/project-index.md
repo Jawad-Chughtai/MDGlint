@@ -103,7 +103,7 @@ Where things live. Keep this current when files are added, moved, or removed.
 | `Assets/index.html` | Preview shell page: CSP, `<base>`, stylesheet links, scripts, the no-file page's Open prompt |
 | `Assets/preview.js` | The page's decisions, tested in Node: messages, theme URLs, absolute-path rewriting, scroll anchoring, code highlighting, `#anchor` targets, file drags |
 | `Assets/app.js` | Wires `preview.js` to the page: render in place, scroll, theme swap, `#anchor` clicks, dropped files to the app, the Open prompt on the no-file page, the ready message |
-| `Assets/app.css` | Page layout around the Markdown, colour scheme, code-block fixes, print rules (no browser header or footer) |
+| `Assets/app.css` | Page layout around the Markdown, colour scheme, code-block fixes, print rules (MDGlint's footer with the page number, no browser header or footer) |
 | `Assets/vendor/github-markdown-css/` | GitHub's Markdown styles, light and dark (MIT, with licence) |
 | `Assets/vendor/highlight.js/` | highlight.js common build, extra languages in `languages/`, GitHub themes (BSD-3, with licence) |
 | `MDGlint.ico` | App and installer icon |
@@ -130,6 +130,6 @@ Where things live. Keep this current when files are added, moved, or removed.
 | `DevTools.cs` | DevTools protocol client for the preview page |
 | `LocalServer.cs` | HTTP server on 127.0.0.1 standing in for remote hosts and GitHub |
 | `PreviewTests.cs` | Scripts blocked, local images and refused files, links, files dropped on the preview, the no-file page's Open button, `#` jumps, keeping the reader's place |
-| `PrintTests.cs` | The light print theme and turning it off, PDF export beside the file and its title, no browser header or footer, Print and Export only with a file open |
+| `PrintTests.cs` | The light print theme and turning it off, PDF export beside the file and its title, MDGlint's footer on every page and no browser header or footer, Print and Export only with a file open |
 | `WindowTests.cs` | Theme, remote content, opening maximized and where it was left, the WebView2-missing notice, ending a leftover preview process |
 | `UpdateFlowTests.cs` | Opt-in respected, install only on request, hash mismatch, the ⋯ menu |

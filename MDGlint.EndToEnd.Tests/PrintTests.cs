@@ -145,13 +145,58 @@ public sealed class PrintTests : IDisposable
         var plain = await PrintedTextRuns(page, headerAndFooter: false);
         Assert.True(plain > 0, "Nothing was printed.");
         Assert.Equal(plain, await PrintedTextRuns(page, headerAndFooter: true));
+
+        // MDGlint's own footer instead: its name, and the page number of the total.
+        Assert.Equal("\"MDGlint\" | counter(page) \" / \" counter(pages)", await page.EvaluateAsync<string>("""
+            [...document.styleSheets].flatMap(sheet => [...sheet.cssRules])
+              .filter(rule => rule instanceof CSSPageRule)
+              .flatMap(rule => [...rule.cssRules])
+              .filter(box => box.name === 'bottom-left' || box.name === 'bottom-right')
+              .map(box => box.style.content).join(' | ')
+            """));
+    }
+
+    [EndToEndFact]
+    public async Task PrintsMDGlintsFooterOnEveryPage()
+    {
+        // A file long enough for several pages; emptying the footer's boxes must take away at
+        // least its two pieces of text (name and page number) from every page.
+        await using var app = await AppSession.StartAsync(Write("notes.md",
+            "# Notes\n\n" + string.Concat(Enumerable.Range(1, 120).Select(i => $"Line {i}.\n\n"))));
+        var page = app.Page;
+        await page.WaitForAsync("document.querySelector('h1')?.textContent === 'Notes'");
+
+        var withFooter = await PrintedTextRuns(page, headerAndFooter: false);
+        var pages = (await PrintAsync(page, headerAndFooter: false)).Pages;
+        Assert.True(pages > 1, $"The file printed on {pages} page.");
+        await page.EvaluateAsync("""
+            for (const sheet of document.styleSheets) {
+              for (const rule of [...sheet.cssRules]) {
+                if (rule instanceof CSSPageRule) {
+                  for (const box of rule.cssRules) { box.style.content = '""'; }
+                }
+              }
+            }
+            """);
+        var withoutFooter = await PrintedTextRuns(page, headerAndFooter: false);
+        Assert.True(withFooter - withoutFooter >= 2 * pages,
+            $"{pages} pages printed {withFooter} runs of text with the footer and {withoutFooter} without.");
+    }
+
+    /// <summary>The page printed to a PDF through DevTools, and how many pages it has.</summary>
+    private static async Task<(byte[] Pdf, int Pages)> PrintAsync(DevTools page, bool headerAndFooter)
+    {
+        var result = await page.SendAsync("Page.printToPDF", new { displayHeaderFooter = headerAndFooter });
+        var pdf = Convert.FromBase64String(result.GetProperty("data").GetString()!);
+        var pages = System.Text.RegularExpressions.Regex.Matches(
+            System.Text.Encoding.Latin1.GetString(pdf), @"/Type\s*/Page\b").Count;
+        return (pdf, pages);
     }
 
     /// <summary>How many runs of text the page prints, counted in the PDF's content streams.</summary>
     private static async Task<int> PrintedTextRuns(DevTools page, bool headerAndFooter)
     {
-        var result = await page.SendAsync("Page.printToPDF", new { displayHeaderFooter = headerAndFooter });
-        var pdf = Convert.FromBase64String(result.GetProperty("data").GetString()!);
+        var (pdf, _) = await PrintAsync(page, headerAndFooter);
         var text = System.Text.Encoding.Latin1.GetString(pdf);
         var runs = 0;
         foreach (System.Text.RegularExpressions.Match stream in System.Text.RegularExpressions.Regex.Matches(text, @"(?<!end)stream\r?\n"))
