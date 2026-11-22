@@ -64,10 +64,10 @@ test('isFileDrag is true only for drags that carry files', () => {
 });
 
 test('readRender fills in what a message leaves out', () => {
-  assert.deepEqual(preview.readRender({ theme: 'dark', html: '<p>x</p>', base: 'https://doc.mdglint.example/C/', resetScroll: true }),
-    { theme: 'dark', html: '<p>x</p>', base: 'https://doc.mdglint.example/C/', resetScroll: true });
-  assert.deepEqual(preview.readRender({ html: 5, base: '', resetScroll: 'yes' }),
-    { theme: undefined, html: '', base: null, resetScroll: false });
+  assert.deepEqual(preview.readRender({ theme: 'dark', html: '<p>x</p>', base: 'https://doc.mdglint.example/C/', resetScroll: true, offersOpen: true }),
+    { theme: 'dark', html: '<p>x</p>', base: 'https://doc.mdglint.example/C/', resetScroll: true, offersOpen: true });
+  assert.deepEqual(preview.readRender({ html: 5, base: '', resetScroll: 'yes', offersOpen: 'yes' }),
+    { theme: undefined, html: '', base: null, resetScroll: false, offersOpen: false });
   assert.equal(preview.readRender({ base: 7 }).base, null);
 });
 

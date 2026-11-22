@@ -7,6 +7,11 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- An **Open…** button on the page shown when no file is open, with a line saying a Markdown file
+  can be dropped there (#18).
+
 ## [1.0.0] - 2026-11-22
 
 ### Added

@@ -93,6 +93,12 @@ public static class PreviewPolicy
     /// </summary>
     public static bool IsDropMessage(string json) => MessageType(json) == "drop";
 
+    /// <summary>
+    /// The shell's <c>{ "type": "open" }</c> message, sent when the user clicks <b>Open…</b> on the
+    /// no-file page. It only asks for the Open dialog; the user picks the file.
+    /// </summary>
+    public static bool IsOpenMessage(string json) => MessageType(json) == "open";
+
     /// <summary>The first dropped file that is Markdown, or null; others are ignored.</summary>
     public static string? DroppedMarkdownFile(IEnumerable<string?>? paths) =>
         paths?.FirstOrDefault(p => !string.IsNullOrWhiteSpace(p) && MarkdownFiles.IsMarkdownFile(p));

@@ -4,12 +4,14 @@
 //
 // Host -> page:
 //   { type: "render", html: "<p>...</p>", base: "https://doc.mdglint.example/C/docs/" | null,
-//     theme: "light" | "dark", resetScroll: true | false }
+//     theme: "light" | "dark", resetScroll: true | false, offersOpen: true | false }
+//     offersOpen is true only for the no-file page, which then gets the shell's Open button.
 //   { type: "theme", theme: "light" | "dark" }
 // Page -> host:
 //   { type: "ready" } once the page has loaded (again after any reload).
 //   { type: "drop" } with the dropped File objects, when files are dropped on the preview.
 //     WebView2 is a window of its own, so the WPF window never sees drops over the preview.
+//   { type: "open" } when the user clicks Open on the no-file page; the app shows its Open dialog.
 (() => {
   'use strict';
 
@@ -19,6 +21,8 @@
   const base = document.getElementById('mdglint-base');
   const markdownThemeLink = document.getElementById('mdglint-markdown-theme');
   const codeThemeLink = document.getElementById('mdglint-code-theme');
+  // Taken from the shell before any content arrives, so only this element can ask for the dialog.
+  const openPrompt = document.getElementById('mdglint-open-prompt').content.firstElementChild.cloneNode(true);
 
   // Pin the shell's own stylesheet links to absolute URLs before the <base> is ever moved to the
   // file's folder, so they keep pointing at the app host.
@@ -60,6 +64,9 @@
     template.innerHTML = update.html;
     preview.rewriteLocalPaths(template.content);
     content.replaceChildren(template.content);
+    if (update.offersOpen) {
+      content.append(openPrompt);
+    }
 
     preview.highlightCode(content, window.hljs);
 
@@ -104,6 +111,12 @@
       case 'theme':
         applyTheme(event.data.theme);
         break;
+    }
+  });
+
+  openPrompt.querySelector('button').addEventListener('click', (event) => {
+    if (event.isTrusted) {
+      webview.postMessage({ type: 'open' });
     }
   });
 

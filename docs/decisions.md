@@ -114,6 +114,13 @@
   (`postMessageWithAdditionalObjects`), which opens the first Markdown path.
   Reason: only a real drop gives a File with a path, so the page can't make
   the app open a file of its choosing; and no native drop hook is needed.
+- **2026-11-22: The no-file page's Open button is the shell's, and it only
+  asks for the dialog.** The button lives in `index.html`, not in the
+  rendered HTML, and the app honours its `{ type: "open" }` message only while
+  the no-file page is shown. The user still picks the file in the system
+  dialog, so the page can never choose what opens. Rejected: rendering the
+  button as part of the message HTML, which would make it content any file
+  could imitate.
 
 ## Packaging and distribution
 

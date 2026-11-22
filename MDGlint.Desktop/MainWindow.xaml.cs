@@ -123,6 +123,7 @@ public partial class MainWindow : Window
                 await RenderCurrentStateAsync();
             };
             _preview.RemoteContentBlocked += (_, _) => RemoteBar.Visibility = Visibility.Visible;
+            _preview.OpenRequested += (_, _) => ShowOpenDialog();
         }
         catch (WebView2RuntimeNotFoundException)
         {
@@ -156,7 +157,9 @@ public partial class MainWindow : Window
         ProcessLauncher.OpenWithDefaultApp(PreviewUnavailableNotice.RuntimeDownloadUrl);
     }
 
-    private void OpenButton_Click(object sender, RoutedEventArgs e)
+    private void OpenButton_Click(object sender, RoutedEventArgs e) => ShowOpenDialog();
+
+    private void ShowOpenDialog()
     {
         var dialog = new OpenFileDialog
         {

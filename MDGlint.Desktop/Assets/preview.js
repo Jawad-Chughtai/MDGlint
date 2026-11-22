@@ -15,7 +15,8 @@ globalThis.MDGlintPreview = (() => {
       theme: message.theme,
       html: typeof message.html === 'string' ? message.html : '',
       base: typeof message.base === 'string' && message.base.length > 0 ? message.base : null,
-      resetScroll: message.resetScroll === true
+      resetScroll: message.resetScroll === true,
+      offersOpen: message.offersOpen === true
     };
   }
 

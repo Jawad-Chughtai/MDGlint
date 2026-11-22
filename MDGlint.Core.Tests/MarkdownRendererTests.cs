@@ -71,6 +71,7 @@ public sealed class MarkdownRendererTests
 
         Assert.Equal("<p class=\"message\">Open a Markdown file to preview it.</p>", document.Html);
         Assert.Null(document.BaseDirectory);
+        Assert.True(document.OffersOpen);
     }
 
     [Fact]
@@ -90,6 +91,7 @@ public sealed class MarkdownRendererTests
         Assert.Contains("<h1 id=\"hi\">Hi</h1>", document.Html);
         Assert.DoesNotContain("<script", document.Html);
         Assert.Equal(Path.GetDirectoryName(path), document.BaseDirectory);
+        Assert.False(document.OffersOpen);
     }
 
     [Fact]
@@ -119,6 +121,7 @@ public sealed class MarkdownRendererTests
 
         Assert.Equal($"<p class=\"message\">{message}</p>", document.Html);
         Assert.Null(document.BaseDirectory);
+        Assert.False(document.OffersOpen);
     }
 
     [Fact]

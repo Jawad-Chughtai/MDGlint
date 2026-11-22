@@ -90,6 +90,17 @@ public sealed class PreviewPolicyTests
         Assert.Equal(expected, PreviewPolicy.IsDropMessage(json));
     }
 
+    [Theory]
+    [InlineData("""{"type":"open"}""", true)]
+    [InlineData("""{"type":"drop"}""", false)]
+    [InlineData("""{"type":"OPEN"}""", false)]
+    [InlineData("""["open"]""", false)]
+    [InlineData("not json", false)]
+    public void IsOpenMessage(string json, bool expected)
+    {
+        Assert.Equal(expected, PreviewPolicy.IsOpenMessage(json));
+    }
+
     [Fact]
     public void DroppedMarkdownFile_IsTheFirstMarkdownFile()
     {

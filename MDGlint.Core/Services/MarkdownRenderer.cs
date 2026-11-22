@@ -32,7 +32,7 @@ public sealed class MarkdownRenderer
 
         if (string.IsNullOrWhiteSpace(filePath))
         {
-            return Message("Open a Markdown file to preview it.");
+            return Message("Open a Markdown file to preview it.") with { OffersOpen = true };
         }
 
         try

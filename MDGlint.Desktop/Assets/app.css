@@ -44,6 +44,36 @@ html[data-theme="dark"] .markdown-body .message {
   color: #9198a1;
 }
 
+/* The Open button on the no-file page, styled like GitHub's default buttons. */
+.markdown-body .open-prompt button {
+  padding: 5px 16px;
+  font: inherit;
+  font-weight: 500;
+  color: #1f2328;
+  background-color: #f6f8fa;
+  border: 1px solid #d1d9e0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.markdown-body .open-prompt button:hover {
+  background-color: #eff2f5;
+}
+
+html[data-theme="dark"] .markdown-body .open-prompt button {
+  color: #f0f6fc;
+  background-color: #212830;
+  border-color: #3d444d;
+}
+
+html[data-theme="dark"] .markdown-body .open-prompt button:hover {
+  background-color: #262c36;
+}
+
+.markdown-body .open-prompt .message {
+  margin-top: 8px;
+}
+
 /* github-markdown-css already gives code blocks their padding and background. */
 .markdown-body pre code.hljs {
   padding: 0;
