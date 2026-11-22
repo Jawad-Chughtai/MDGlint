@@ -365,7 +365,10 @@
   the **⋯** menu, off by default and for older settings files, lets testers
   get pre-releases. With it on, the check reads the ten newest releases
   (`releases?per_page=10`, since `releases/latest` skips pre-releases) and
-  offers the highest version among them, beta or stable. Ten is enough
+  offers the highest version among them. Under Semantic Versioning a
+  stable release outranks its own betas (`1.2.0` over `1.2.0-beta.2`), so
+  a beta is offered only while it is for a newer version than the latest
+  stable release. Ten is enough
   because releases come newest first and a beta is always of a newer
   version than the stable releases before it. Betas get the same rules:
   drafts and anything outside this repository are ignored, the SHA-256
