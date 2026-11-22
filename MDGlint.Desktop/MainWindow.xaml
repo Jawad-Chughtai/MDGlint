@@ -168,6 +168,9 @@
                                       InputGestureText="Ctrl+P"
                                       Click="PrintMenuItem_Click" />
                             <MenuItem x:Name="ExportMenuItem" Header="Export">
+                                <MenuItem x:Name="ExportHtmlMenuItem"
+                                          Header="HTML…"
+                                          Click="ExportHtmlMenuItem_Click" />
                                 <MenuItem x:Name="ExportPdfMenuItem"
                                           Header="PDF…"
                                           Click="ExportPdfMenuItem_Click" />

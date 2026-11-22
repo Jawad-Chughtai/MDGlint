@@ -16,6 +16,8 @@
 //   { type: "open" } when the user clicks Open on the no-file page; the app shows its Open dialog.
 // Each code block gets the shell's Copy button, which copies the block's text with the page's
 // own clipboard access; the app isn't involved.
+// For Export ▸ HTML the app calls mdglintExport() (ExecuteScriptAsync), which returns the shown
+// content's HTML.
 (() => {
   'use strict';
 
@@ -101,6 +103,26 @@
 
     document.body.hidden = false;
   }
+
+  // The shown file as it reads on screen, highlighting included, without the shell's own
+  // controls: code blocks lose their Copy buttons, and the no-file page's Open prompt is dropped.
+  // Image and media addresses become absolute, as relative ones only make sense under <base>.
+  globalThis.mdglintExport = () => {
+    const copy = content.cloneNode(true);
+    for (const block of copy.querySelectorAll('.code-block')) {
+      block.replaceWith(...block.querySelectorAll(':scope > pre'));
+    }
+
+    for (const prompt of copy.querySelectorAll('.open-prompt')) {
+      prompt.remove();
+    }
+
+    for (const element of copy.querySelectorAll('[src]')) {
+      element.setAttribute('src', new URL(element.getAttribute('src'), document.baseURI).href);
+    }
+
+    return copy.innerHTML;
+  };
 
   // Wraps each code block so its Copy button can sit in the corner without scrolling with the code.
   function addCopyButtons() {

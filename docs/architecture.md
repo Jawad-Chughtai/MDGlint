@@ -125,6 +125,25 @@ render and theme messages carry `printLight`. `app.js` then limits the dark styl
 `preview.js`). `app.css` undoes its own dark rules under `@media print`. The screen never
 changes, and nothing has to switch back after printing.
 
+## HTML export
+
+**Export ▸ HTML…** saves one page that needs nothing else, in the current theme:
+
+1. `PreviewHost.ExportContentAsync` runs the shell's `mdglintExport()` (`app.js`). This returns the
+   shown content as it reads on screen, highlighting included, without the Copy buttons or the
+   no-file prompt, and with every `src` made absolute.
+2. `HtmlExporter` (Core) parses it with AngleSharp. It leaves out video, audio and `<source>`, and
+   drops `srcset`. It turns each image's address into a `data:` URL through `ExportImages`, or
+   leaves the image out when that fails. It writes a page with a Content Security Policy
+   allowing only inline styles and `data:` images, the file's name as its title, and
+   `data-theme` for the theme.
+3. `ExportImages` follows the preview's rules. A document-host address is read from disk only if
+   `PreviewPolicy.TryGetLocalMedia` would serve it as an image. A remote image is downloaded
+   only when remote content is allowed for the file. Anything over 25 MB, or not an image, is
+   left out.
+4. `ExportStyles` inlines the theme's github-markdown-css and highlight.js stylesheets, each after
+   its license, then `export.css` (the page layout from `app.css`).
+
 ## Copying
 
 After each render, `app.js` wraps every `<pre>` in a `div.code-block` with a Copy button

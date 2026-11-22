@@ -49,25 +49,9 @@ public sealed class PrintTests : IDisposable
         await using var app = await AppSession.StartAsync(file);
         await app.Page.WaitForAsync("document.querySelector('h1')?.textContent === 'Notes'");
 
-        var export = await app.MenuItemAsync("Export");
-        ((ExpandCollapsePattern)export.GetCurrentPattern(ExpandCollapsePattern.Pattern)).Expand();
-        ((InvokePattern)(await app.OpenMenuItemAsync("PDF…")).GetCurrentPattern(InvokePattern.Pattern)).Invoke();
-
-        await AppSession.WaitUntilAsync(() => app.FindWindow("Export to PDF") is not null, "The Save dialog didn't appear.");
-        var dialog = app.FindWindow("Export to PDF")!;
-        var name = dialog.FindFirst(TreeScope.Descendants, new AndCondition(
-            new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Edit),
-            new PropertyCondition(AutomationElement.AutomationIdProperty, "1001")));
+        var suggested = await app.ExportWithSuggestedNameAsync("PDF…", "Export to PDF");
         // Without the extension where Explorer hides known ones (the Windows default).
-        // The box can still be empty for a moment after the dialog appears.
-        string Suggested() => ((ValuePattern)name.GetCurrentPattern(ValuePattern.Pattern)).Current.Value;
-        await AppSession.WaitUntilAsync(() => Suggested().Length > 0, "The dialog suggested no name.");
-        var suggested = Suggested();
         Assert.True(suggested is "notes.pdf" or "notes", $"The dialog suggested \"{suggested}\".");
-        var save = dialog.FindFirst(TreeScope.Children, new AndCondition(
-            new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Button),
-            new PropertyCondition(AutomationElement.AutomationIdProperty, "1")));
-        ((InvokePattern)save.GetCurrentPattern(InvokePattern.Pattern)).Invoke();
 
         // A runner's first PDF can take a while; if none comes, say what the app is showing.
         try
