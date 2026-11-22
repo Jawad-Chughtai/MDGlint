@@ -144,6 +144,32 @@ changes, and nothing has to switch back after printing.
 4. `ExportStyles` inlines the theme's github-markdown-css and highlight.js stylesheets, each after
    its license, then `export.css` (the page layout from `app.css`).
 
+## Word export
+
+**Export ▸ Word…** saves a `.docx`, always in GitHub's light colours, built with the Open XML
+SDK. It starts from the same content as the HTML export (`mdglintExport()`), which is already
+sanitized and has absolute image addresses.
+
+1. `DocxExporter` (Core) parses the content with AngleSharp and reads each image address once:
+   a `data:image` URL is decoded, an http(s) address goes to `ExportImages.LoadAsync` (the same
+   rules as above). `ImageInfo` then reads the type and size from the image's own header; only
+   PNG, JPEG, GIF and BMP, which every Word can show, are kept.
+2. `DocxWriter` walks the HTML. Headings use Word's Heading 1–6 styles, so the navigation pane
+   and a table of contents work. Lists use Word numbering (one bulleted list, and a numbering
+   instance per numbered list so each restarts at its `start`); a task's ☐ or ☑ stands in
+   for its bullet. Code blocks become one shaded monospace paragraph per line, without
+   syntax colours. Quotes and alerts are indented with a left border, grey for quotes and
+   GitHub's colour for each kind of alert. Tables get a header row
+   that repeats on each page, the columns' alignment and `colspan`, and every row is filled to
+   the grid. Markdig's footnotes become Word footnotes at their first reference. Any other
+   element is read for its text, and white space collapses as in HTML.
+3. Images are stored in the document at their size (or the HTML's `width` and `height`), no
+   wider than 6 inches; one that can't be stored is replaced by its alt text, in italics.
+   Nothing is linked, so Word never loads anything when the file is opened. Only `http`,
+   `https` and `mailto` links become hyperlinks; links to other files or places in the page
+   stay as text.
+4. `DocxParts` holds the styles, the list formats and the settings (no Compatibility Mode).
+
 ## Copying
 
 After each render, `app.js` wraps every `<pre>` in a `div.code-block` with a Copy button

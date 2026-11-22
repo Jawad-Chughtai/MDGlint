@@ -19,8 +19,9 @@ the [roadmap](docs/roadmap.md).
   onto the window.
 - Copy a code block with its Copy button, or the whole file's Markdown with **Copy Markdown**
   (Ctrl+Shift+C) in the **⋯** menu.
-- Print (Ctrl+P), or export to PDF or to one self-contained HTML file, from the **⋯** menu. Printouts and PDFs use the light theme
-  unless you turn that off in the same menu.
+- Print (Ctrl+P), or export to PDF, to one self-contained HTML file or to a Word document, from
+  the **⋯** menu. Printouts and PDFs use the light theme unless you turn that off in the same
+  menu; Word documents always do.
 - GitHub-flavoured Markdown via [Markdig](https://github.com/xoofx/markdig): tables, task lists,
   footnotes, autolinks, and the rest of Markdig's advanced extensions.
 - GitHub's Markdown styling ([github-markdown-css](https://github.com/sindresorhus/github-markdown-css))

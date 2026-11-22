@@ -17,6 +17,10 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Export ▸ HTML…** in the **⋯** menu: one self-contained `.html` file in the current theme, with
   the styles inlined and the images embedded (#11). Remote images are included only when
   they're allowed for the file. Video and audio are left out.
+- **Export ▸ Word…** in the **⋯** menu: a `.docx` in the light theme, with headings in Word's
+  own styles, lists, tables, code blocks, quotes, alerts, footnotes and the images stored in it
+  (#13). Remote images are included only when they're allowed for the file; an image that
+  can't be included is replaced by its alt text. Code blocks don't keep their syntax colours.
 - **Print in light theme** in the **⋯** menu, on by default: printouts and PDFs use the light
   theme while the window shows the dark one.
 - A **Copy** button on each code block, shown when the pointer is over it, which copies the
