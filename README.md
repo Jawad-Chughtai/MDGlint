@@ -61,8 +61,9 @@ press it. You can update from any older version straight to the latest one. You 
 download the latest installer yourself and run it over your installed copy.
 
 To test new versions early, turn on **Get beta versions** in the **⋯** menu. The check then
-also offers pre-releases (`1.2.0-beta.1`), whichever is newest, beta or stable, with the same
-SHA-256 check. Turning it off never goes back to an older version: you stay on the beta until
+also offers pre-releases (`1.2.0-beta.1`), with the same SHA-256 check. A beta is offered only
+when it is for a newer version than the latest stable release; once that version is released
+as stable (`1.2.0`), the stable one is offered instead of its betas. Turning it off never goes back to an older version: you stay on the beta until
 a newer stable version is out. Versions before 1.1 can't see betas, so download the first one
 yourself from the [releases page](https://github.com/Jawad-Chughtai/MDGlint/releases).
 
