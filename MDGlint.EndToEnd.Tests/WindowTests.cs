@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.Json;
 using System.Windows.Automation;
 using MDGlint.Core.Models;
@@ -136,6 +137,57 @@ public sealed class WindowTests : IDisposable
         await app.InvokeAsync("DownloadWebView2Button");
         await AppSession.WaitUntilAsync(() => app.Launches().Length == 1, "The download link didn't open.");
         Assert.Equal(PreviewUnavailableNotice.RuntimeDownloadUrl + "|", app.Launches()[0]);
+    }
+
+    [EndToEndFact]
+    public async Task EndsAPreviewProcessAClosedWindowLeftBehind()
+    {
+        // Stands in for a leftover WebView2 browser process: a program named msedgewebview2.exe
+        // whose command line names the session's data folder, started by something that isn't
+        // MDGlint, so no MDGlint window owns it. (cmd waits on ping; "rem" ignores the rest.)
+        var file = Path.Combine(_docs, "notes.md");
+        File.WriteAllText(file, "# Notes");
+        Process? leftover = null;
+        try
+        {
+            await using var app = await AppSession.StartAsync(file, new AppOptions
+            {
+                ConnectToPreview = false,
+                BeforeStart = folder =>
+                {
+                    var fake = Path.Combine(folder, "fake", "msedgewebview2.exe");
+                    Directory.CreateDirectory(Path.GetDirectoryName(fake)!);
+                    File.Copy(Path.Combine(Environment.SystemDirectory, "cmd.exe"), fake);
+                    var dataDir = Path.Combine(folder, "data", "Local", "MDGlint", "WebView2", "EBWebView");
+                    leftover = Process.Start(new ProcessStartInfo(fake)
+                    {
+                        Arguments = $"/d /c ping -n 120 127.0.0.1 >nul & rem --user-data-dir=\"{dataDir}\"",
+                        UseShellExecute = false,
+                        CreateNoWindow = true,
+                    });
+                },
+            });
+
+            // Said at once, not after WebView2's long timeout, and with the way out.
+            var title = await app.WaitForTextAsync("PreviewUnavailableTitle", t => t.Length > 0, 10);
+            Assert.Equal(PreviewUnavailableNotice.Stuck.Title, title);
+            Assert.Null(app.Find("DownloadWebView2Button"));
+
+            await app.InvokeAsync("EndStuckPreviewButton");
+            await AppSession.WaitUntilAsync(() => leftover!.HasExited, "The leftover process wasn't ended.");
+            await app.ConnectToPreviewAsync();
+            await app.Page.WaitForAsync("document.querySelector('h1')?.textContent === 'Notes'", "The file wasn't shown.", 30);
+            Assert.Equal("notes.md", await app.Page.EvaluateAsync<string>("document.title"));
+        }
+        finally
+        {
+            if (leftover is { HasExited: false })
+            {
+                leftover.Kill(entireProcessTree: true);
+            }
+
+            leftover?.Dispose();
+        }
     }
 
     /// <summary>The saved "Always allow" choice; off until the user changes it.</summary>

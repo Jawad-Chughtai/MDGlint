@@ -101,8 +101,21 @@ public partial class MainWindow : Window
         WindowState = _settings.WindowMaximized ? WindowState.Maximized : WindowState.Normal;
     }
 
-    private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    private async void MainWindow_Loaded(object sender, RoutedEventArgs e) => await StartPreviewAsync();
+
+    private async Task StartPreviewAsync()
     {
+        PreviewUnavailablePanel.Visibility = Visibility.Collapsed;
+        PreviewStartingText.Visibility = Visibility.Visible;
+
+        // A preview process left by a closed window would make this one wait and time out, so say
+        // so at once instead.
+        if (PreviewUnavailableNotice.BeforeStart(LeftoverPreview.Exists(AppPaths.WebView2Folder), LeftoverPreview.OtherWindows()) is { } stuck)
+        {
+            ShowPreviewUnavailable(stuck);
+            return;
+        }
+
         try
         {
             Directory.CreateDirectory(AppPaths.WebView2Folder);
@@ -132,11 +145,18 @@ public partial class MainWindow : Window
             ShowPreviewUnavailable(PreviewUnavailableNotice.RuntimeMissing);
             return;
         }
+        catch (Exception ex) when (ex.HResult == PreviewUnavailableNotice.TimeoutHResult)
+        {
+            ShowPreviewUnavailable(PreviewUnavailableNotice.ForTimeout(LeftoverPreview.Exists(AppPaths.WebView2Folder), LeftoverPreview.OtherWindows(), ex.Message));
+            return;
+        }
         catch (Exception ex)
         {
             ShowPreviewUnavailable(PreviewUnavailableNotice.StartFailed(ex.Message));
             return;
         }
+
+        PreviewStartingText.Visibility = Visibility.Collapsed;
 
         // The first render happens when the preview page reports it is ready.
         if (!string.IsNullOrWhiteSpace(_currentFilePath))
@@ -147,11 +167,38 @@ public partial class MainWindow : Window
 
     private void ShowPreviewUnavailable(PreviewUnavailableNotice notice)
     {
+        PreviewStartingText.Visibility = Visibility.Collapsed;
         PreviewBrowser.Visibility = Visibility.Collapsed;
         PreviewUnavailableTitle.Text = notice.Title;
         PreviewUnavailableMessage.Text = notice.Message;
+        var download = notice.Action == PreviewNoticeAction.DownloadRuntime;
+        DownloadWebView2Button.Visibility = download ? Visibility.Visible : Visibility.Collapsed;
+        PreviewUnavailableLink.Visibility = download ? Visibility.Visible : Visibility.Collapsed;
         PreviewUnavailableLink.Text = PreviewUnavailableNotice.RuntimeDownloadUrl;
+        EndStuckPreviewButton.Visibility = notice.Action == PreviewNoticeAction.EndStuckPreview
+            ? Visibility.Visible
+            : Visibility.Collapsed;
         PreviewUnavailablePanel.Visibility = Visibility.Visible;
+    }
+
+    private async void EndStuckPreview_Click(object sender, RoutedEventArgs e)
+    {
+        EndStuckPreviewButton.IsEnabled = false;
+        LeftoverPreview.End(AppPaths.WebView2Folder);
+
+        // A WebView2 control whose start failed can't start again, so a new one takes its place.
+        var grid = (System.Windows.Controls.Grid)PreviewBrowser.Parent;
+        var index = grid.Children.IndexOf(PreviewBrowser);
+        var fresh = new Microsoft.Web.WebView2.Wpf.WebView2();
+        System.Windows.Controls.Grid.SetRow(fresh, System.Windows.Controls.Grid.GetRow(PreviewBrowser));
+        grid.Children.RemoveAt(index);
+        PreviewBrowser.Dispose();
+        grid.Children.Insert(index, fresh);
+        PreviewBrowser = fresh;
+        ApplyThemeChrome();
+
+        EndStuckPreviewButton.IsEnabled = true;
+        await StartPreviewAsync();
     }
 
     private void DownloadWebView2_Click(object sender, RoutedEventArgs e)

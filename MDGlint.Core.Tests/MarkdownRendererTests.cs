@@ -72,6 +72,7 @@ public sealed class MarkdownRendererTests
         Assert.Equal("<p class=\"message\">Open a Markdown file to preview it.</p>", document.Html);
         Assert.Null(document.BaseDirectory);
         Assert.True(document.OffersOpen);
+        Assert.Null(document.Title);
     }
 
     [Fact]
@@ -92,6 +93,7 @@ public sealed class MarkdownRendererTests
         Assert.DoesNotContain("<script", document.Html);
         Assert.Equal(Path.GetDirectoryName(path), document.BaseDirectory);
         Assert.False(document.OffersOpen);
+        Assert.Equal("readme.md", document.Title);
     }
 
     [Fact]
@@ -100,6 +102,7 @@ public sealed class MarkdownRendererTests
         var document = await _renderer.RenderFileAsync("readme.md", new FakeReader(_ => "x"));
 
         Assert.Equal(Path.GetDirectoryName(Path.GetFullPath("readme.md")), document.BaseDirectory);
+        Assert.Equal("readme.md", document.Title);
     }
 
     public static TheoryData<Exception, string> ReadFailures => new()
@@ -122,6 +125,7 @@ public sealed class MarkdownRendererTests
         Assert.Equal($"<p class=\"message\">{message}</p>", document.Html);
         Assert.Null(document.BaseDirectory);
         Assert.False(document.OffersOpen);
+        Assert.Null(document.Title);
     }
 
     [Fact]

@@ -109,7 +109,8 @@ public sealed class PreviewHost
             theme = theme.ToStorageValue(),
             resetScroll = isNewDocument,
             offersOpen = document.OffersOpen,
-            printLight = PrintInLightTheme
+            printLight = PrintInLightTheme,
+            title = document.Title
         });
     }
 
@@ -138,8 +139,9 @@ public sealed class PreviewHost
         }
     }
 
-    /// <summary>Prints the shown file through the system print dialog.</summary>
-    public void ShowPrintDialog() => _core.ShowPrintUI(CoreWebView2PrintDialogKind.System);
+    /// <summary>Prints the shown file through WebView2's print dialog, which previews the printout; it
+    /// also offers the system dialog. It runs in the page, so it closes with the window.</summary>
+    public void ShowPrintDialog() => _core.ShowPrintUI(CoreWebView2PrintDialogKind.Browser);
 
     /// <summary>
     /// Saves the shown file as a PDF, as it would print (backgrounds included, no browser header

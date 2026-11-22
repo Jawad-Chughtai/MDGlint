@@ -59,7 +59,11 @@ public sealed class PrintTests : IDisposable
             new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Edit),
             new PropertyCondition(AutomationElement.AutomationIdProperty, "1001")));
         // Without the extension where Explorer hides known ones (the Windows default).
-        Assert.Contains(((ValuePattern)name.GetCurrentPattern(ValuePattern.Pattern)).Current.Value, new[] { "notes.pdf", "notes" });
+        // The box can still be empty for a moment after the dialog appears.
+        string Suggested() => ((ValuePattern)name.GetCurrentPattern(ValuePattern.Pattern)).Current.Value;
+        await AppSession.WaitUntilAsync(() => Suggested().Length > 0, "The dialog suggested no name.");
+        var suggested = Suggested();
+        Assert.True(suggested is "notes.pdf" or "notes", $"The dialog suggested \"{suggested}\".");
         var save = dialog.FindFirst(TreeScope.Children, new AndCondition(
             new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Button),
             new PropertyCondition(AutomationElement.AutomationIdProperty, "1")));
@@ -76,6 +80,40 @@ public sealed class PrintTests : IDisposable
             throw new TimeoutException(
                 $"The PDF wasn't saved. PDFs in the folder: [{string.Join(", ", pdfs)}]. The app shows: {OpenWindows(app)}");
         }
+
+        // Its title is the file's name, not "MDGlint": as text, or as UTF-16 in hex.
+        await AppSession.WaitUntilAsync(() => PdfTitle(pdf) is not null, "The PDF has no title.");
+        Assert.Equal("notes.md", PdfTitle(pdf));
+    }
+
+    /// <summary>The PDF's /Title, written either as (text) or as &lt;FEFF…&gt; UTF-16 hex.</summary>
+    private static string? PdfTitle(string path)
+    {
+        string text;
+        try
+        {
+            text = System.Text.Encoding.Latin1.GetString(File.ReadAllBytes(path));
+        }
+        catch (IOException)
+        {
+            return null; // Still being written.
+        }
+
+        var match = System.Text.RegularExpressions.Regex.Match(text, @"/Title\s*(\((?<text>[^)]*)\)|<(?<hex>[0-9A-Fa-f]+)>)");
+        if (!match.Success)
+        {
+            return null;
+        }
+
+        if (match.Groups["text"].Success)
+        {
+            return match.Groups["text"].Value;
+        }
+
+        var bytes = Convert.FromHexString(match.Groups["hex"].Value);
+        return bytes.Length >= 2 && bytes[0] == 0xFE && bytes[1] == 0xFF
+            ? System.Text.Encoding.BigEndianUnicode.GetString(bytes, 2, bytes.Length - 2)
+            : System.Text.Encoding.Latin1.GetString(bytes);
     }
 
     /// <summary>The app's windows and the text in them, such as a dialog still open or an error.</summary>

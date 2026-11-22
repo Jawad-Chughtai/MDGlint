@@ -29,6 +29,9 @@ internal sealed record AppOptions
     public bool ConnectToPreview { get; init; } = true;
 
     public Dictionary<string, string> Environment { get; init; } = [];
+
+    /// <summary>Runs with the session's folder just before the app starts.</summary>
+    public Action<string>? BeforeStart { get; init; }
 }
 
 /// <summary>
@@ -56,6 +59,18 @@ internal sealed class AppSession : IAsyncDisposable
 
     public DevTools Page { get; private set; } = null!;
 
+    /// <summary>The app's WebView2 data folder (the Debug build's data-folder hook puts it here).</summary>
+    public string WebView2Folder => Path.Combine(Folder, "data", "Local", "MDGlint", "WebView2");
+
+    private int _port;
+
+    /// <summary>Connects to the preview once it has started, for a session started without connecting.</summary>
+    public async Task ConnectToPreviewAsync()
+    {
+        Page = await DevTools.ConnectAsync(_port, "https://app.mdglint.example/", StartTimeout);
+        await Page.WaitForAsync("window.MDGlintPreview && document.readyState === 'complete'", "The preview page didn't load.", 30);
+    }
+
     public static string NewFolder()
     {
         var folder = Path.Combine(Path.GetTempPath(), "MDGlintE2E", Guid.NewGuid().ToString("N"));
@@ -71,6 +86,8 @@ internal sealed class AppSession : IAsyncDisposable
         File.WriteAllText(session.SettingsFile, options.Settings);
 
         var port = FreePort();
+        session._port = port;
+        options.BeforeStart?.Invoke(session.Folder);
         var start = new ProcessStartInfo(AppPath()) { UseShellExecute = false };
         if (file is not null)
         {

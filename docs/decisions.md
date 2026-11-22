@@ -138,7 +138,21 @@
   stylesheets (`media="print"`), so the screen never changes. Rejected:
   switching the page to light while printing (the dialog gives no reliable
   moment to switch back), and WebView2's own print preview (the issue asks
-  for the system dialog).
+  for the system dialog). *(The system dialog was superseded 2026-11-22 by
+  "Print uses WebView2's own dialog" below.)*
+- **2026-11-22: Print uses WebView2's own dialog.** The system dialog says
+  the app doesn't support print preview, and after a debug session it left
+  the WebView2 browser process running, so later windows couldn't start.
+  WebView2's dialog (`CoreWebView2PrintDialogKind.Browser`) previews the
+  page, can still open the system dialog, and closes with the window.
+- **2026-11-22: A leftover preview process is found and can be ended.** A
+  browser process left by a closed window blocks every new window, and
+  WebView2 only times out after a long wait. MDGlint recognises it by its
+  command line (MDGlint's data folder, no `--type=`) and a parent that is
+  gone. It says so at once, and ends it only when the user presses **End it
+  and try again**. It never ends a process another open window uses.
+  Rejected: Restart Manager, which didn't report the lock file's holder, and
+  ending it without asking.
 
 ## Packaging and distribution
 

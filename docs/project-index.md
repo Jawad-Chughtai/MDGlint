@@ -48,7 +48,7 @@ Where things live. Keep this current when files are added, moved, or removed.
 | `Models/SemanticVersion.cs` | Parses and orders versions and release tags (SemVer 2.0) |
 | `Models/UpdateInfo.cs` | Update source and asset names, an available update, check results, the verified installer |
 | `Models/UpdatePreference.cs` | Whether update checks are on (in-app choice, then setup's) and when one is due |
-| `Models/PreviewUnavailableNotice.cs` | Texts and download link shown when WebView2 is missing or fails to start |
+| `Models/PreviewUnavailableNotice.cs` | Texts, link and action shown when WebView2 is missing, stuck behind a leftover process, or fails to start |
 | `Models/ThemeKind.cs` | `Light`/`Dark` and their storage strings |
 | `Models/RenderedDocument.cs` | Rendered HTML fragment plus the folder it resolves against |
 | `Services/AppSettingsSerializer.cs` | `settings.json` text to `AppSettings` and back, with defaults for missing or damaged files |
@@ -66,7 +66,7 @@ Where things live. Keep this current when files are added, moved, or removed.
 | `AppSettingsTests.cs` | Settings files from older versions, damaged files, round trips |
 | `AppVersionTests.cs` | Version display text; built assemblies match `Directory.Build.props` |
 | `HtmlContentSanitizerTests.cs` | What the sanitizer keeps and removes |
-| `PreviewUnavailableNoticeTests.cs` | The WebView2 notices' texts and link |
+| `PreviewUnavailableNoticeTests.cs` | The WebView2 notices' texts, link and actions, and which one each case gets |
 | `MarkdownRendererTests.cs` | Rendering, sanitizing, file read failures and messages |
 | `RemoteContentPolicyTests.cs` | Remote-content choices and remote-address detection |
 | `RenderPlanTests.cs` | New-document and remote-content decisions per render |
@@ -89,6 +89,7 @@ Where things live. Keep this current when files are added, moved, or removed.
 | `Services/AppSettingsStore.cs` | `ISettingsStore` as JSON in `%APPDATA%\MDGlint` |
 | `Services/FileWatcherService.cs` | Watches the open file; 250 ms debounced reload on the window's thread |
 | `Services/UpdateLauncher.cs` | Setup's update-check choice from the registry, the download folder, running the installer, the HTTP client (and the Debug update-server redirect) |
+| `Services/LeftoverPreview.cs` | Finds, and on request ends, a WebView2 browser process a closed window left holding MDGlint's data folder |
 | `Helpers/AppPaths.cs` | Where settings, WebView2 data, downloads and the error log go (and the Debug data-folder hook) |
 | `Helpers/BrowserArguments.cs` | Extra WebView2 browser arguments; only the Debug hook sets any (the end-to-end tests' DevTools port) |
 | `Helpers/DocumentUrls.cs` | Local path ↔ `https://doc.mdglint.example/C/...` URL mapping |
@@ -97,6 +98,7 @@ Where things live. Keep this current when files are added, moved, or removed.
 | `Helpers/ExportFiles.cs` | Where the Export dialogs start: the open file's folder and name |
 | `Helpers/PreviewPolicy.cs` | The preview's rules: the shell page, which local files load and as what, blocked remote requests, accepted messages, what a clicked link does |
 | `Helpers/ProcessLauncher.cs` | Starts every program MDGlint opens (browser, Explorer, setup); the Debug launch log |
+| `Helpers/PreviewProcess.cs` | Recognises MDGlint's WebView2 browser process by its command line, and whether its window is gone |
 | `Helpers/WindowPlacement.cs` | Where the window opens (maximized by default, else its saved bounds fitted to the screen) and what it saves on closing |
 | `Assets/index.html` | Preview shell page: CSP, `<base>`, stylesheet links, scripts, the no-file page's Open prompt |
 | `Assets/preview.js` | The page's decisions, tested in Node: messages, theme URLs, absolute-path rewriting, scroll anchoring, code highlighting, `#anchor` targets, file drags |
@@ -117,6 +119,7 @@ Where things live. Keep this current when files are added, moved, or removed.
 | `ServicesTests.cs` | `AppSettingsStore`, `UpdateLauncher` (registry, downloads, starting setup, HTTP client) |
 | `FileWatcherServiceTests.cs` | Saves, renames, deletes, debouncing, stopping, the window's thread |
 | `WindowPlacementTests.cs` | Default maximized, restoring and fitting saved bounds, what closing saves |
+| `PreviewProcessTests.cs` | Which command lines are MDGlint's browser process; when its window counts as gone |
 | `ReleaseCompatibilityTests.cs` | `installer.iss`, `release.yml` and the app agree on the names and formats updates rely on |
 | `Preview/preview.test.mjs` | `Assets/preview.js`, with Node's built-in test runner |
 
@@ -128,5 +131,5 @@ Where things live. Keep this current when files are added, moved, or removed.
 | `LocalServer.cs` | HTTP server on 127.0.0.1 standing in for remote hosts and GitHub |
 | `PreviewTests.cs` | Scripts blocked, local images and refused files, links, files dropped on the preview, the no-file page's Open button, `#` jumps, keeping the reader's place |
 | `PrintTests.cs` | The light print theme and turning it off, PDF export beside the file, Print and Export only with a file open |
-| `WindowTests.cs` | Theme, remote content, opening maximized and where it was left, the WebView2-missing notice |
+| `WindowTests.cs` | Theme, remote content, opening maximized and where it was left, the WebView2-missing notice, ending a leftover preview process |
 | `UpdateFlowTests.cs` | Opt-in respected, install only on request, hash mismatch, the ⋯ menu |
