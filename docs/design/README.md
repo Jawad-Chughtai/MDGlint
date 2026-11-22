@@ -7,9 +7,8 @@ pictures of ideas, not specs: nothing here is built until an issue says so.
 
 Three separate directions for the window, made on 2026-11-22 for
 [#19, App design](https://github.com/Jawad-Chughtai/MDGlint/issues/19). All three show the same
-sample file at 1280×800. Each folder entry has a PNG to look at and the HTML it was rendered
-from (open it in a browser; the fonts load from Google Fonts). The editable originals are on the
-owner's private design canvas: <https://claude.ai/artifact/2tVWpn5jmQLVuz2Bm6o76j>.
+sample file at 1280×800. Each has a PNG to look at and the HTML it was rendered from, which is
+the editable source (open it in a browser; the fonts load from Google Fonts).
 
 | Direction | Picture | Idea |
 | --- | --- | --- |
