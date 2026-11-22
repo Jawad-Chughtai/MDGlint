@@ -57,7 +57,8 @@ public sealed class PrintTests : IDisposable
         var name = dialog.FindFirst(TreeScope.Descendants, new AndCondition(
             new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Edit),
             new PropertyCondition(AutomationElement.AutomationIdProperty, "1001")));
-        Assert.Equal("notes.pdf", ((ValuePattern)name.GetCurrentPattern(ValuePattern.Pattern)).Current.Value);
+        // Without the extension where Explorer hides known ones (the Windows default).
+        Assert.Contains(((ValuePattern)name.GetCurrentPattern(ValuePattern.Pattern)).Current.Value, new[] { "notes.pdf", "notes" });
         ((ValuePattern)name.GetCurrentPattern(ValuePattern.Pattern)).SetValue(pdf);
         var save = dialog.FindFirst(TreeScope.Children, new AndCondition(
             new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Button),
