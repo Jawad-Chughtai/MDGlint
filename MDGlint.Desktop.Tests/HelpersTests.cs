@@ -97,7 +97,22 @@ public sealed class HelpersTests : IDisposable
         ProcessLauncher.Start(
             new ProcessStartInfo("cmd.exe", $"/c echo ran> \"{marker}\"") { UseShellExecute = false, CreateNoWindow = true }, null);
 
-        Assert.True(SpinWait.SpinUntil(() => File.Exists(marker), TimeSpan.FromSeconds(10)));
+        // cmd creates the file before it writes and closes it; wait until it is closed, or
+        // Dispose can't delete the folder.
+        Assert.True(SpinWait.SpinUntil(() => IsClosed(marker), TimeSpan.FromSeconds(10)));
+    }
+
+    private static bool IsClosed(string path)
+    {
+        try
+        {
+            using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.None);
+            return stream.Length > 0;
+        }
+        catch (IOException)
+        {
+            return false;
+        }
     }
 
     [Fact]
