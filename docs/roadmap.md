@@ -25,18 +25,12 @@ Milestone: [1.1 Export, print and copy](https://github.com/Jawad-Chughtai/MDGlin
 - **Copy** (#15): a copy button on each code block, and a command that copies the whole file's
   Markdown.
 
-Also in 1.1 (the first three come from testing 1.0.0 on a clean PC):
+Also in 1.1 (the first two come from testing 1.0.0 on a clean PC):
 
 - **Reopen the file after an update** (#16). Setup reopens MDGlint without the file that was open.
   Before starting setup, MDGlint notes the open file in `%LOCALAPPDATA%\MDGlint`; the next
   start with no file opens it if the note is a few minutes old, then deletes it. Setup doesn't
   change. Works for updates started from 1.1 on.
-- **Download updates in the background** (#17). With update checks on, a found update downloads and is
-  verified without a click; the bar says it installs when MDGlint closes and offers **Restart
-  now**. Closing runs setup silently without reopening. All-users installs need administrator
-  rights, so they keep the **Install** button (download only in the background). With checks off,
-  nothing changes. Changes "it installs only when the user presses **Install**" (`decisions.md`,
-  "Update checks are opt-in"); record the new choice there.
 - **An Open button on the no-file page** (#18), beside "Open a Markdown file to preview it", plus a
   line saying a file can be dropped there. The page only asks for the Open dialog; the user
   picks the file.
@@ -102,6 +96,10 @@ Ideas not yet committed to a release.
   other platforms and remove the WebView2 licence terms, but means rewriting the app around a
   bundled Chromium that MDGlint itself must keep patched, plus a larger, slower app (decision
   log).
+- **Download updates in the background** (#17). Moved out of 1.1, to be designed later (decision
+  log). Installing when MDGlint closes would reverse "Update checks are opt-in", and MDGlint
+  runs one process per open file, so closing one window can't simply run setup. One option is to
+  download in the background and install only when **Restart now** is pressed.
 - **Quick peek at other file types** (#39): plain text, JSON, YAML, CSV as a table, source code with
   highlighting. Decide whether this fits once tabs exist.
 

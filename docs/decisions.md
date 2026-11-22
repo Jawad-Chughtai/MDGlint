@@ -17,6 +17,13 @@
   `roadmap.md`, one small release at a time, so each release has something
   to show. Constraint kept from the original goal: opening a file must stay
   instant.
+- **2026-11-22: Background updates (#17) move out of 1.1.** As written, #17
+  installs when MDGlint closes, which reverses the rejected option in
+  "Update checks are opt-in" (the user should choose when the app closes).
+  MDGlint also starts a process per open file, so "when it closes" has no
+  clear meaning with several windows open. 1.1 should be a stable release,
+  so #17 waits for its own design (`roadmap.md`, Exploring). The issue
+  stays open with no milestone.
 - **Open source, MIT.** Published on GitHub so anyone can use it. MIT keeps
   reuse simple and matches the dependencies' permissive licenses.
 - **GitHub-inspired look, own stylesheets.** *(Superseded 2026-11-19 by
