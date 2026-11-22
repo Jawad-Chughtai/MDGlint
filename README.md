@@ -4,8 +4,9 @@ A fast, no-fuss Markdown app for Windows. Double-click a `.md` file and see it r
 GitHub-style formatting, in light or dark mode.
 
 MDGlint starts instantly and stays out of your way: open a file, read it, and the preview
-refreshes whenever the file is saved. Export, diagrams, tabs, quick inline edits and more are on
-the [roadmap](docs/roadmap.md).
+refreshes whenever the file is saved. Print it, export it to PDF, HTML or Word, or copy its
+code. Quick inline edits, diagrams, navigation, tabs and more are on the
+[roadmap](docs/roadmap.md).
 
 <p>
   <img src="docs/images/screenshot-light.png" alt="MDGlint showing a Markdown file with a tip, a table and highlighted Python code in the light theme" width="49%">
@@ -64,8 +65,8 @@ download the latest installer yourself and run it over your installed copy.
 To test new versions early, turn on **Get beta versions** in the **⋯** menu. The check then
 also offers pre-releases (`1.2.0-beta.1`), with the same SHA-256 check. A beta is offered only
 when it is for a newer version than the latest stable release; once that version is released
-as stable (`1.2.0`), the stable one is offered instead of its betas. Turning it off never goes back to an older version: you stay on the beta until
-a newer stable version is out. Versions before 1.1 can't see betas, so download the first one
+as stable (`1.2.0`), the stable one is offered instead of its betas. Turning it off never goes
+back to an older version: you stay on the beta until a newer stable version is out. Versions before 1.1 can't see betas, so download the first one
 yourself from the [releases page](https://github.com/Jawad-Chughtai/MDGlint/releases).
 
 > **Windows SmartScreen:** the installer is not code-signed yet, so Windows may show
@@ -106,7 +107,7 @@ keeps its crash reports on your PC. See [SECURITY.md](SECURITY.md).
 
 | What | Location |
 |---|---|
-| Settings (theme, remote content, update checks, window size) | `%APPDATA%\MDGlint\settings.json` |
+| Settings (theme, remote content, printing in the light theme, update checks, beta versions, window size) | `%APPDATA%\MDGlint\settings.json` |
 | WebView2 cache and crash reports | `%LOCALAPPDATA%\MDGlint\WebView2\` |
 | A downloaded update, until the next start | `%LOCALAPPDATA%\MDGlint\Updates\` |
 | The file to reopen after an update, until the next start | `%LOCALAPPDATA%\MDGlint\reopen.txt` |
@@ -140,8 +141,8 @@ Node.js), [docs/testing.md](docs/testing.md) for the tests, and
 
 ## Roadmap
 
-New features ship in small releases, in priority order: export, printing and copying, quick
-inline editing, diagrams, navigation, then tabs. See [docs/roadmap.md](docs/roadmap.md) for the plan
+New features ship in small releases, in priority order: quick inline editing and a new look,
+diagrams, navigation, then tabs. See [docs/roadmap.md](docs/roadmap.md) for the plan
 and [CHANGELOG.md](CHANGELOG.md) for what has shipped.
 
 ## Contributing
