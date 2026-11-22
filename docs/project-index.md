@@ -90,6 +90,7 @@ Where things live. Keep this current when files are added, moved, or removed.
 | `Services/FileWatcherService.cs` | Watches the open file; 250 ms debounced reload on the window's thread |
 | `Services/UpdateLauncher.cs` | Setup's update-check choice from the registry, the download folder, running the installer, the HTTP client (and the Debug update-server redirect) |
 | `Helpers/AppPaths.cs` | Where settings, WebView2 data, downloads and the error log go (and the Debug data-folder hook) |
+| `Helpers/BrowserArguments.cs` | Extra WebView2 browser arguments; only the Debug hook sets any (the end-to-end tests' DevTools port) |
 | `Helpers/DocumentUrls.cs` | Local path ↔ `https://doc.mdglint.example/C/...` URL mapping |
 | `Helpers/ErrorLog.cs` | Saves unhandled-error details; the error dialog's text |
 | `Helpers/MarkdownFiles.cs` | `.md`/`.markdown` extension check |
@@ -111,7 +112,7 @@ Where things live. Keep this current when files are added, moved, or removed.
 |---|---|
 | `DocumentUrlsTests.cs` | Path ↔ URL mapping, refused paths |
 | `PreviewPolicyTests.cs` | Shell page, local media types, remote blocking, messages, link actions |
-| `HelpersTests.cs` | `MarkdownFiles`, `AppPaths`, `ProcessLauncher`, `ErrorLog`, `FileMarkdownReader` |
+| `HelpersTests.cs` | `MarkdownFiles`, `AppPaths`, `ProcessLauncher`, `ErrorLog`, `FileMarkdownReader`, `BrowserArguments` |
 | `ServicesTests.cs` | `AppSettingsStore`, `UpdateLauncher` (registry, downloads, starting setup, HTTP client) |
 | `FileWatcherServiceTests.cs` | Saves, renames, deletes, debouncing, stopping, the window's thread |
 | `WindowPlacementTests.cs` | Default maximized, restoring and fitting saved bounds, what closing saves |
