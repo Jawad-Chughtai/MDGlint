@@ -7,6 +7,8 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-22
+
 ### Added
 
 - An **Open…** button on the page shown when no file is open, with a line saying a Markdown file
@@ -100,5 +102,6 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   built by this repository's release workflow:
   `gh attestation verify MDGlintSetup.exe -R Jawad-Chughtai/MDGlint`.
 
-[Unreleased]: https://github.com/Jawad-Chughtai/MDGlint/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/Jawad-Chughtai/MDGlint/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/Jawad-Chughtai/MDGlint/releases/tag/v1.1.0
 [1.0.0]: https://github.com/Jawad-Chughtai/MDGlint/releases/tag/v1.0.0
