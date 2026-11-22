@@ -36,6 +36,7 @@ Where things live. Keep this current when files are added, moved, or removed.
 | `docs/issue-tracking.md` | GitHub Issues: labels, milestones, workflow, agent permissions |
 | `docs/releasing.md` | Steps to cut a release |
 | `docs/images/` | README screenshots, and `sample.md`, the document they show |
+| `docs/design/` | Design mock-ups kept for later releases (`README.md` lists them) |
 | `docs/testing.md` | The kinds of tests, how to run them and check coverage, the Debug test hooks |
 
 ## MDGlint.Core (net10.0, no Windows dependencies)
