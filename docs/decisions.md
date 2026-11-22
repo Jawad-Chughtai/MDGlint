@@ -153,6 +153,12 @@
   and try again**. It never ends a process another open window uses.
   Rejected: Restart Manager, which didn't report the lock file's holder, and
   ending it without asking.
+- **2026-11-22: Printouts have no browser header or footer.** WebView2's
+  dialog adds the date, title, the shell page's internal address and the
+  page number, and a PDF export has none of them. Empty `@page` margin boxes
+  keep them off and leave the page's margins as set in the dialog. Rejected:
+  `@page { margin: 0 }`, which also hides them but prints to the paper's
+  edge; and page numbers of MDGlint's own, which can be added later if wanted.
 
 ## Packaging and distribution
 
