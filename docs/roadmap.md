@@ -13,34 +13,6 @@ issues hold the details and the discussion, and this file stays the high-level p
 not tied to a release are issues without a milestone. When a release ships, move its section to
 `CHANGELOG.md` and delete it here.
 
-## 1.1 — Export, print and copy
-
-Milestone: [1.1 Export, print and copy](https://github.com/Jawad-Chughtai/MDGlint/milestone/1)
-
-- **HTML** (#11): a self-contained `.html` file with the current theme's styles inlined.
-- **PDF** (#12): via WebView2's built-in print-to-PDF, with a light theme option for printing.
-- **DOCX** (#13): Markdown to Word with headings, lists, tables, code and images. Needs a library
-  choice (for example the Open XML SDK, MIT) recorded in `decisions.md`.
-- Print, through the system print dialog (#14).
-- **Copy** (#15): a copy button on each code block, and a command that copies the whole file's
-  Markdown.
-
-Also in 1.1 (the first two come from testing 1.0.0 on a clean PC):
-
-- **Reopen the file after an update** (#16). Setup reopens MDGlint without the file that was open.
-  Before starting setup, MDGlint notes the open file in `%LOCALAPPDATA%\MDGlint`; the next
-  start with no file opens it if the note is a few minutes old, then deletes it. Setup doesn't
-  change. Works for updates started from 1.1 on.
-- **An Open button on the no-file page** (#18), beside "Open a Markdown file to preview it", plus a
-  line saying a file can be dropped there. The page only asks for the Open dialog; the user
-  picks the file.
-- **Opt in to beta updates** (#48). A **Get beta versions** option in the **⋯** menu, off by
-  default; with it on, the update check also offers pre-releases (`x.y.z-beta.n`), newest first,
-  with the same hash check and install rules as stable updates. Turning it off never downgrades.
-  Changes "How the update check decides" (`decisions.md`), which reads only
-  `releases/latest`; record the new choice there. Copies older than 1.1 can't see betas, so
-  the first one is downloaded by hand.
-
 ## 1.2 — Quick inline edits
 
 Milestone: [1.2 Quick inline edits](https://github.com/Jawad-Chughtai/MDGlint/milestone/2)
