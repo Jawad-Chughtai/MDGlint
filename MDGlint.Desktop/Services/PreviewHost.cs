@@ -155,6 +155,21 @@ public sealed class PreviewHost
         return _core.PrintToPdfAsync(path, settings);
     }
 
+    /// <summary>
+    /// The shown content's HTML for Export ▸ HTML, from the shell's <c>mdglintExport()</c>
+    /// (app.js), or null if the preview isn't showing the shell page.
+    /// </summary>
+    public async Task<string?> ExportContentAsync()
+    {
+        if (!PreviewPolicy.IsShell(_core.Source))
+        {
+            return null;
+        }
+
+        var result = await _core.ExecuteScriptAsync("typeof mdglintExport === 'function' ? mdglintExport() : null");
+        return JsonSerializer.Deserialize<string?>(result);
+    }
+
     private void Post(object message) => _core.PostWebMessageAsJson(JsonSerializer.Serialize(message));
 
     /// <summary>

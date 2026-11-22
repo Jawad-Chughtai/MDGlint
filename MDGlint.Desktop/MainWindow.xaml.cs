@@ -1,7 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
@@ -402,6 +404,55 @@ public partial class MainWindow : Window
         {
             MessageBox.Show(this, $"MDGlint couldn't save {dialog.FileName}.", "Export to PDF",
                 MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    /// <summary>
+    /// Saves the shown file as one self-contained HTML page in the current theme (HtmlExporter),
+    /// with images embedded under the preview's rules (ExportImages).
+    /// </summary>
+    private async void ExportHtmlMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        if (!FileShown)
+        {
+            return;
+        }
+
+        var shown = _shownFilePath!;
+        var dialog = new SaveFileDialog
+        {
+            Filter = "HTML files (*.html)|*.html",
+            Title = "Export to HTML",
+            FileName = ExportFiles.SuggestedName(shown, ".html"),
+            InitialDirectory = ExportFiles.SuggestedFolder(shown),
+        };
+        if (dialog.ShowDialog(this) != true)
+        {
+            return;
+        }
+
+        // Remote images can take a moment to download.
+        Mouse.OverrideCursor = Cursors.Wait;
+        try
+        {
+            var content = await _preview!.ExportContentAsync() ?? throw new InvalidOperationException("The preview isn't showing the file.");
+            using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
+            http.DefaultRequestHeaders.UserAgent.ParseAdd("MDGlint");
+            var images = new ExportImages(http, _remotePolicy.IsAllowed(shown));
+            var html = await HtmlExporter.BuildAsync(content, Path.GetFileName(shown), _themeService.Theme,
+                ExportStyles.For(Path.Combine(AppContext.BaseDirectory, "Assets"), _themeService.Theme), images.EmbedAsync);
+            await File.WriteAllTextAsync(dialog.FileName, html);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or COMException
+            or InvalidOperationException or JsonException)
+        {
+            Mouse.OverrideCursor = null;
+            MessageBox.Show(this, $"MDGlint couldn't save {dialog.FileName}.", "Export to HTML",
+                MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        finally
+        {
+            Mouse.OverrideCursor = null;
         }
     }
 

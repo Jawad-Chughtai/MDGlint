@@ -282,6 +282,33 @@ internal sealed class AppSession : IAsyncDisposable
             new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Window),
             new PropertyCondition(AutomationElement.NameProperty, name)));
 
+    /// <summary>
+    /// Opens ⋯ ▸ Export ▸ <paramref name="format"/> and saves under the name the Save dialog
+    /// suggests, which is returned. (Typing a name through UI Automation doesn't register on the
+    /// CI runner, so the tests keep the suggestion.)
+    /// </summary>
+    public async Task<string> ExportWithSuggestedNameAsync(string format, string dialogTitle)
+    {
+        var export = await MenuItemAsync("Export");
+        ((ExpandCollapsePattern)export.GetCurrentPattern(ExpandCollapsePattern.Pattern)).Expand();
+        ((InvokePattern)(await OpenMenuItemAsync(format)).GetCurrentPattern(InvokePattern.Pattern)).Invoke();
+
+        await WaitUntilAsync(() => FindWindow(dialogTitle) is not null, "The Save dialog didn't appear.");
+        var dialog = FindWindow(dialogTitle)!;
+        var name = dialog.FindFirst(TreeScope.Descendants, new AndCondition(
+            new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Edit),
+            new PropertyCondition(AutomationElement.AutomationIdProperty, "1001")));
+        // The box can still be empty for a moment after the dialog appears.
+        string Suggested() => ((ValuePattern)name.GetCurrentPattern(ValuePattern.Pattern)).Current.Value;
+        await WaitUntilAsync(() => Suggested().Length > 0, "The dialog suggested no name.");
+        var suggested = Suggested();
+        var save = dialog.FindFirst(TreeScope.Children, new AndCondition(
+            new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Button),
+            new PropertyCondition(AutomationElement.AutomationIdProperty, "1")));
+        ((InvokePattern)save.GetCurrentPattern(InvokePattern.Pattern)).Invoke();
+        return suggested;
+    }
+
     /// <summary>Opens the ⋯ menu and returns one of its items (the menu is a window of its own).</summary>
     public async Task<AutomationElement> MenuItemAsync(string name)
     {

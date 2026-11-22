@@ -172,6 +172,18 @@
   not the rendered page. Rejected: a message asking the app to copy page
   text, which would let the page put any text on the clipboard through the
   app.
+- **2026-11-22: HTML export (#11) is one file that loads nothing.** The
+  content is taken from the preview as shown, so the code is highlighted
+  as on screen without running highlight.js in the exported file. Styles
+  are inlined with their licenses, and images are embedded as `data:` URLs.
+  Images follow the Remote content choice, like the preview and PDF: local
+  images are included, and remote ones only when allowed for the file.
+  Those are downloaded at export time, so the file works offline and when
+  sent on. Video and audio are left out rather than linked, and the page's
+  Content Security Policy blocks anything else, so opening the file never
+  contacts anyone. AngleSharp, already shipped for HtmlSanitizer, does the
+  HTML work, so no new library is needed. Rejected: linking remote images,
+  which would load them from the internet whenever the file is opened.
 
 ## Packaging and distribution
 
