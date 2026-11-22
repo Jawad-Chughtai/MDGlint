@@ -24,6 +24,12 @@ public sealed class AppSettings
     /// </summary>
     public bool? CheckForUpdates { get; set; }
 
+    /// <summary>
+    /// Also offer pre-releases (<c>x.y.z-beta.n</c>). Off by default, which also applies to
+    /// settings files written before 1.1, which don't have it.
+    /// </summary>
+    public bool GetBetaVersions { get; set; }
+
     /// <summary>When MDGlint last checked for updates on its own.</summary>
     public DateTimeOffset? LastUpdateCheck { get; set; }
 

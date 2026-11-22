@@ -188,6 +188,10 @@
                                       Header="Check for updates automatically"
                                       IsCheckable="True"
                                       Click="AutoUpdateMenuItem_Click" />
+                            <MenuItem x:Name="BetaMenuItem"
+                                      Header="Get beta versions"
+                                      IsCheckable="True"
+                                      Click="BetaMenuItem_Click" />
                             <MenuItem x:Name="CheckNowMenuItem"
                                       Header="Check for updates now"
                                       Click="CheckNowMenuItem_Click" />

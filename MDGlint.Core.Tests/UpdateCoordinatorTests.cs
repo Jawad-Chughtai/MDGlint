@@ -101,6 +101,59 @@ public sealed class UpdateCoordinatorTests : IDisposable
     }
 
     [Fact]
+    public async Task SetBetaVersionsAsync_ChecksForBetasRightAwayWhenChecksAreOn()
+    {
+        _handler.Respond(UpdateSource.ReleasesApi.AbsoluteUri, Releases(ReleaseJson("v1.1.0-beta.1", preRelease: true)));
+        // Already checked today: turning betas on checks anyway.
+        var coordinator = Coordinator(new AppSettings { CheckForUpdates = true, LastUpdateCheck = Now });
+
+        await coordinator.SetBetaVersionsAsync(true);
+
+        Assert.True(coordinator.BetaVersions);
+        Assert.True(_store.Saved!.GetBetaVersions);
+        Assert.Equal(UpdateSource.ReleasesApi, Assert.Single(_handler.Requests).RequestUri);
+        Assert.Equal("MDGlint 1.1.0-beta.1 is available (you have 1.0.0).", coordinator.State.Text);
+
+        // Turning it off takes the beta back.
+        await coordinator.SetBetaVersionsAsync(false);
+
+        Assert.False(_store.Saved!.GetBetaVersions);
+        Assert.Equal(UpdateBarState.Hidden, coordinator.State);
+        Assert.Null(coordinator.Update);
+    }
+
+    [Fact]
+    public async Task SetBetaVersionsAsync_OnlySavesWhileChecksAreOff()
+    {
+        var coordinator = Coordinator(new AppSettings());
+
+        await coordinator.SetBetaVersionsAsync(true);
+        await coordinator.SetBetaVersionsAsync(false); // Nothing offered, nothing to take back.
+
+        Assert.False(_store.Saved!.GetBetaVersions);
+        Assert.Empty(_handler.Requests);
+        Assert.Empty(_states);
+    }
+
+    [Fact]
+    public async Task SetBetaVersionsAsync_OffKeepsAStableReleaseOrADownload()
+    {
+        var coordinator = await CoordinatorWithUpdate(SHA256.HashData(Installer), holdDownload: true);
+        var offered = coordinator.State;
+
+        await coordinator.SetBetaVersionsAsync(false);
+        Assert.Equal(offered, coordinator.State);
+
+        var install = coordinator.InstallOrCancelAsync(); // Downloading.
+        var downloading = coordinator.State;
+        await coordinator.SetBetaVersionsAsync(false);
+        Assert.Equal(downloading, coordinator.State);
+
+        await coordinator.InstallOrCancelAsync(); // Cancels.
+        await install;
+    }
+
+    [Fact]
     public async Task CheckAsync_OffersOnlyThePageForAPageOnlyRelease()
     {
         _handler.Respond(Api, ReleaseJson("v1.2.0", assets: [Asset(UpdateSource.InstallerName)]));

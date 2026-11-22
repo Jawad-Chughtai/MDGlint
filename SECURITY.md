@@ -54,9 +54,9 @@ None at the moment. Known issues are listed here until they are fixed.
   Microsoft.
 - MDGlint itself sends no telemetry. Its only network requests of its own are update checks, and only
   when you turn them on (in setup or the **⋯** menu) or press **Check for updates now**: a
-  request to the GitHub API for the latest release, at most once a day, which lets GitHub see
-  your IP address and MDGlint's version. With checks off, MDGlint makes no requests of its
-  own.
+  request to the GitHub API for the latest release (with **Get beta versions** on, for the
+  newest releases, pre-releases included), at most once a day, which lets GitHub see your IP
+  address and MDGlint's version. With checks off, MDGlint makes no requests of its own.
 - An update is installed only when you press **Install**. MDGlint downloads only the installer and
   its `MDGlintSetup.exe.sha256` file attached to a release of this repository, refuses the
   installer unless its SHA-256 matches that file, and keeps it locked from that check until

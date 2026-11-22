@@ -35,7 +35,12 @@ public sealed partial class UpdateService
 
     public string CurrentVersion { get; }
 
-    public async Task<UpdateCheckResult> CheckAsync(CancellationToken cancellationToken = default)
+    public Task<UpdateCheckResult> CheckAsync(CancellationToken cancellationToken = default) =>
+        CheckAsync(includeBetas: false, cancellationToken);
+
+    /// <param name="includeBetas">Also offer pre-releases: reads the newest releases instead of
+    /// the latest stable one, and offers whichever is newest, beta or stable.</param>
+    public async Task<UpdateCheckResult> CheckAsync(bool includeBetas, CancellationToken cancellationToken = default)
     {
         if (!SemanticVersion.TryParse(CurrentVersion, out var current))
         {
@@ -45,7 +50,7 @@ public sealed partial class UpdateService
         string json;
         try
         {
-            using var request = CreateRequest(UpdateSource.LatestReleaseApi);
+            using var request = CreateRequest(includeBetas ? UpdateSource.ReleasesApi : UpdateSource.LatestReleaseApi);
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
             request.Headers.Add("X-GitHub-Api-Version", "2022-11-28");
             using var response = await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
@@ -75,7 +80,7 @@ public sealed partial class UpdateService
         AvailableUpdate? latest;
         try
         {
-            latest = ParseRelease(json);
+            latest = includeBetas ? ParseNewestRelease(json) : ParseRelease(json);
         }
         catch (Exception ex) when (ex is JsonException or FormatException or InvalidOperationException or KeyNotFoundException)
         {
@@ -96,15 +101,38 @@ public sealed partial class UpdateService
     public static AvailableUpdate? ParseRelease(string json)
     {
         using var document = JsonDocument.Parse(json);
-        var root = document.RootElement;
+        return ParseRelease(document.RootElement, allowPreRelease: false);
+    }
 
+    /// <summary>
+    /// Reads GitHub's list of releases and returns the newest version in it, pre-releases
+    /// included, under the same rules as <see cref="ParseRelease(string)"/>; null when none qualifies.
+    /// </summary>
+    public static AvailableUpdate? ParseNewestRelease(string json)
+    {
+        using var document = JsonDocument.Parse(json);
+        AvailableUpdate? newest = null;
+        foreach (var release in document.RootElement.EnumerateArray())
+        {
+            if (ParseRelease(release, allowPreRelease: true) is { } update && (newest is null || update.Version > newest.Version))
+            {
+                newest = update;
+            }
+        }
+
+        return newest;
+    }
+
+    private static AvailableUpdate? ParseRelease(JsonElement root, bool allowPreRelease)
+    {
         if (root.TryGetProperty("draft", out var draft) && draft.GetBoolean()
-            || root.TryGetProperty("prerelease", out var preRelease) && preRelease.GetBoolean())
+            || !allowPreRelease && root.TryGetProperty("prerelease", out var preRelease) && preRelease.GetBoolean())
         {
             return null;
         }
 
-        if (!SemanticVersion.TryParse(root.GetProperty("tag_name").GetString(), out var version) || version.IsPreRelease)
+        if (!SemanticVersion.TryParse(root.GetProperty("tag_name").GetString(), out var version)
+            || version.IsPreRelease && !allowPreRelease)
         {
             return null;
         }
