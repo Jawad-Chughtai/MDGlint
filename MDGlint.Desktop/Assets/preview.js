@@ -17,7 +17,8 @@ globalThis.MDGlintPreview = (() => {
       base: typeof message.base === 'string' && message.base.length > 0 ? message.base : null,
       resetScroll: message.resetScroll === true,
       offersOpen: message.offersOpen === true,
-      printLight: message.printLight === true
+      printLight: message.printLight === true,
+      title: typeof message.title === 'string' && message.title.length > 0 ? message.title : null
     };
   }
 

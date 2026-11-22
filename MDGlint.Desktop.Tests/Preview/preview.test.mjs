@@ -64,11 +64,12 @@ test('isFileDrag is true only for drags that carry files', () => {
 });
 
 test('readRender fills in what a message leaves out', () => {
-  assert.deepEqual(preview.readRender({ theme: 'dark', html: '<p>x</p>', base: 'https://doc.mdglint.example/C/', resetScroll: true, offersOpen: true, printLight: true }),
-    { theme: 'dark', html: '<p>x</p>', base: 'https://doc.mdglint.example/C/', resetScroll: true, offersOpen: true, printLight: true });
-  assert.deepEqual(preview.readRender({ html: 5, base: '', resetScroll: 'yes', offersOpen: 'yes', printLight: 'yes' }),
-    { theme: undefined, html: '', base: null, resetScroll: false, offersOpen: false, printLight: false });
+  assert.deepEqual(preview.readRender({ theme: 'dark', html: '<p>x</p>', base: 'https://doc.mdglint.example/C/', resetScroll: true, offersOpen: true, printLight: true, title: 'notes.md' }),
+    { theme: 'dark', html: '<p>x</p>', base: 'https://doc.mdglint.example/C/', resetScroll: true, offersOpen: true, printLight: true, title: 'notes.md' });
+  assert.deepEqual(preview.readRender({ html: 5, base: '', resetScroll: 'yes', offersOpen: 'yes', printLight: 'yes', title: 3 }),
+    { theme: undefined, html: '', base: null, resetScroll: false, offersOpen: false, printLight: false, title: null });
   assert.equal(preview.readRender({ base: 7 }).base, null);
+  assert.equal(preview.readRender({ title: '' }).title, null);
 });
 
 test('printPlan prints dark files in the light theme only when asked', () => {

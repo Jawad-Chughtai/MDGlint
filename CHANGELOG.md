@@ -11,10 +11,16 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - An **Open…** button on the page shown when no file is open, with a line saying a Markdown file
   can be dropped there (#18).
-- **Print…** in the **⋯** menu, also with Ctrl+P, through the system print dialog (#14).
+- **Print…** in the **⋯** menu, also with Ctrl+P, through WebView2's print dialog, which shows a
+  preview (#14).
 - **Export ▸ PDF…** in the **⋯** menu, saved beside the open file by default (#12).
 - **Print in light theme** in the **⋯** menu, on by default: printouts and PDFs use the light
   theme while the window shows the dark one.
+- PDFs are titled with the file's name.
+- "Starting the preview…" shows while the preview starts.
+- When a closed MDGlint window has left its preview process running, a new window says so at
+  once, instead of failing after a long wait, and offers **End it and try again**, which ends
+  only that leftover process and starts the preview.
 
 ## [1.0.0] - 2026-11-22
 

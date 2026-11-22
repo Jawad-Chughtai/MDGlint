@@ -38,7 +38,8 @@ public sealed class MarkdownRenderer
         try
         {
             var markdown = await fileReader.ReadAsync(filePath, cancellationToken);
-            return new RenderedDocument(Render(markdown), Path.GetDirectoryName(Path.GetFullPath(filePath)));
+            var fullPath = Path.GetFullPath(filePath);
+            return new RenderedDocument(Render(markdown), Path.GetDirectoryName(fullPath), Title: Path.GetFileName(fullPath));
         }
         catch (FileNotFoundException)
         {

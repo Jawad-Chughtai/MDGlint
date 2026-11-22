@@ -30,6 +30,14 @@ later (see `decisions.md`).
    preview and stops: one for a missing runtime (`WebView2RuntimeNotFoundException`) and one for
    any other start failure, with the error. Both link to Microsoft's WebView2 download page
    (texts in `PreviewUnavailableNotice`).
+   While it starts, the window shows "Starting the preview…". All MDGlint windows share one
+   WebView2 browser process, since they use the same data folder. A closed window can leave that
+   process running: a `msedgewebview2.exe` with no `--type=`, MDGlint's `--user-data-dir`, and a
+   parent that is gone (`PreviewProcess`, `LeftoverPreview`). A new window then can't start its
+   own, and WebView2 only times out (`0x800705B4`) after a long wait. So when no other MDGlint
+   window is open and such a process exists, the window says so at once; a timeout says which
+   case it is. **End it and try again** ends only that process and its children, then starts the
+   preview in a fresh control.
 3. **Shell page.** `PreviewHost.Attach` turns off what the preview doesn't need (host objects,
    autofill, password saving, DevTools in Release builds, and SmartScreen, which would send page
    addresses to Microsoft), sets up two hosts and loads the shell page once:
@@ -99,7 +107,10 @@ to switch stylesheets: the github-markdown-css and highlight.js theme for the ne
 
 ## Printing and PDF export
 
-**Print…** (⋯ menu or Ctrl+P) opens the system print dialog (`ShowPrintUI`). **Export ▸ PDF…**
+**Print…** (⋯ menu or Ctrl+P) opens WebView2's print dialog, with a preview
+(`ShowPrintUI(CoreWebView2PrintDialogKind.Browser)`). The system dialog can't preview a WebView2
+page, and it could leave the browser process running after the window closed. The page title is
+the file's name (the render message's `title`), so a PDF is titled with it. **Export ▸ PDF…**
 saves the file with WebView2's `PrintToPdfAsync` beside the open file by default
 (`ExportFiles`), with backgrounds and no browser header or footer. Both print the page as it is
 shown, so a PDF has the same images, and the same remote-content choice, as the preview. Both

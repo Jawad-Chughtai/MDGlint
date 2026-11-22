@@ -5,7 +5,7 @@
 // Host -> page:
 //   { type: "render", html: "<p>...</p>", base: "https://doc.mdglint.example/C/docs/" | null,
 //     theme: "light" | "dark", resetScroll: true | false, offersOpen: true | false,
-//     printLight: true | false }
+//     printLight: true | false, title: "notes.md" | null }
 //     offersOpen is true only for the no-file page, which then gets the shell's Open button.
 //     printLight prints (and exports PDFs) in the light theme whatever the window shows.
 //   { type: "theme", theme: "light" | "dark", printLight: true | false }
@@ -59,6 +59,8 @@
   function render(message) {
     const update = preview.readRender(message);
     applyTheme(update.theme, update.printLight);
+    // The page title names the file in a printout's header and a PDF's properties.
+    document.title = update.title ?? 'MDGlint';
 
     const anchor = update.resetScroll
       ? null
