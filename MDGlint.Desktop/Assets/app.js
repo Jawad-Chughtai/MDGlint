@@ -14,6 +14,8 @@
 //   { type: "drop" } with the dropped File objects, when files are dropped on the preview.
 //     WebView2 is a window of its own, so the WPF window never sees drops over the preview.
 //   { type: "open" } when the user clicks Open on the no-file page; the app shows its Open dialog.
+// Each code block gets the shell's Copy button, which copies the block's text with the page's
+// own clipboard access; the app isn't involved.
 (() => {
   'use strict';
 
@@ -29,6 +31,10 @@
   ];
   // Taken from the shell before any content arrives, so only this element can ask for the dialog.
   const openPrompt = document.getElementById('mdglint-open-prompt').content.firstElementChild.cloneNode(true);
+  const copyButtonTemplate = document.getElementById('mdglint-copy-button').content.firstElementChild;
+  // The buttons this script made; a click on anything else that looks like one does nothing.
+  const copyButtons = new WeakSet();
+  const copyResetMs = 2000;
 
   // Pin the shell's own stylesheet links to absolute URLs before the <base> is ever moved to the
   // file's folder, so they keep pointing at the app host.
@@ -84,6 +90,7 @@
     }
 
     preview.highlightCode(content, window.hljs);
+    addCopyButtons();
 
     const scroll = preview.scrollAfterRender(update.resetScroll, anchor, Array.from(content.children), previousScrollY);
     if (scroll.by !== undefined) {
@@ -94,6 +101,43 @@
 
     document.body.hidden = false;
   }
+
+  // Wraps each code block so its Copy button can sit in the corner without scrolling with the code.
+  function addCopyButtons() {
+    for (const pre of content.querySelectorAll('pre')) {
+      const block = document.createElement('div');
+      block.className = 'code-block';
+      const button = copyButtonTemplate.cloneNode(true);
+      copyButtons.add(button);
+      pre.replaceWith(block);
+      block.append(pre, button);
+    }
+  }
+
+  function showCopyState(button, state) {
+    const label = preview.copyLabel(state);
+    button.setAttribute('aria-label', label);
+    button.title = label;
+    button.dataset.state = state;
+    clearTimeout(button.copyReset);
+    if (state !== 'ready') {
+      button.copyReset = setTimeout(() => showCopyState(button, 'ready'), copyResetMs);
+    }
+  }
+
+  content.addEventListener('click', async (event) => {
+    const button = event.target instanceof Element ? event.target.closest('button.copy-code') : null;
+    if (!button || !copyButtons.has(button) || !event.isTrusted) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(preview.codeText(button.parentElement.querySelector(':scope > pre')));
+      showCopyState(button, 'copied');
+    } catch {
+      showCopyState(button, 'failed');
+    }
+  });
 
   document.addEventListener('click', (event) => {
     const link = event.target instanceof Element ? event.target.closest('a[href]') : null;

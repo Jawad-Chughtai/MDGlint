@@ -227,13 +227,14 @@ public sealed class PrintTests : IDisposable
     }
 
     [EndToEndFact]
-    public async Task OffersPrintAndExportOnlyForAFile()
+    public async Task OffersPrintExportAndCopyOnlyForAFile()
     {
         await using var app = await AppSession.StartAsync(null);
         await app.Page.WaitForAsync("document.querySelector('#mdglint-content .open-prompt') !== null");
 
         Assert.False((await app.MenuItemAsync("Print…")).Current.IsEnabled);
         Assert.False((await app.OpenMenuItemAsync("Export")).Current.IsEnabled);
+        Assert.False((await app.OpenMenuItemAsync("Copy Markdown")).Current.IsEnabled);
     }
 
     private static Task<string> Background(DevTools page, string selector) =>

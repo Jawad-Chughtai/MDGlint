@@ -17,6 +17,8 @@ the [roadmap](docs/roadmap.md).
 - Opens `.md` and `.markdown` files by double-click (after setting MDGlint as the default app),
   from the Open button (also on the page shown when no file is open), or by dragging a file
   onto the window.
+- Copy a code block with its Copy button, or the whole file's Markdown with **Copy Markdown**
+  (Ctrl+Shift+C) in the **⋯** menu.
 - Print (Ctrl+P), or export to PDF, from the **⋯** menu. Printouts and PDFs use the light theme
   unless you turn that off in the same menu.
 - GitHub-flavoured Markdown via [Markdig](https://github.com/xoofx/markdig): tables, task lists,

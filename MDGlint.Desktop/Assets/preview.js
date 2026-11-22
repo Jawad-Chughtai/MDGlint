@@ -244,6 +244,25 @@ globalThis.MDGlintPreview = (() => {
     }
   }
 
+  // What a code block's Copy button copies: the code as written in the file, without the newline
+  // every rendered block ends with. Highlighting only wraps the text in spans, so it stays the same.
+  function codeText(pre) {
+    const code = pre.querySelector('code') || pre;
+    return code.textContent.replace(/\n$/, '');
+  }
+
+  // The Copy button's label: "Copy", then for a moment what happened.
+  function copyLabel(state) {
+    switch (state) {
+      case 'copied':
+        return 'Copied';
+      case 'failed':
+        return "Couldn't copy";
+      default:
+        return 'Copy';
+    }
+  }
+
   // With a <base> pointing at the file's folder, "#heading" links would otherwise resolve to a
   // different document, so app.js handles them as in-page jumps. Returns the target's id ("" for
   // the top of the page), or null for any other link.
@@ -272,6 +291,8 @@ globalThis.MDGlintPreview = (() => {
     restoreAnchor,
     scrollAfterRender,
     highlightCode,
+    codeText,
+    copyLabel,
     inPageTarget,
     findTarget
   };

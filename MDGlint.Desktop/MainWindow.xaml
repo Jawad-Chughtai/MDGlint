@@ -172,6 +172,10 @@
                                           Header="PDF…"
                                           Click="ExportPdfMenuItem_Click" />
                             </MenuItem>
+                            <MenuItem x:Name="CopyMarkdownMenuItem"
+                                      Header="Copy Markdown"
+                                      InputGestureText="Ctrl+Shift+C"
+                                      Click="CopyMarkdownMenuItem_Click" />
                             <MenuItem x:Name="PrintLightMenuItem"
                                       Header="Print in light theme"
                                       IsCheckable="True"

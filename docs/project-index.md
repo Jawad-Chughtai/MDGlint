@@ -82,7 +82,7 @@ Where things live. Keep this current when files are added, moved, or removed.
 | Path | What |
 |---|---|
 | `App.xaml(.cs)` | Startup, command-line file argument, unhandled-error dialog and log |
-| `MainWindow.xaml(.cs)` | Toolbar (version, Open, Reload, Remote, theme, ⋯ menu with Print, Export, the print-theme choice and update options), Ctrl+P, remote-content bar, update bar, WebView2 setup (crash reports kept local) and the notice when it can't start, drag and drop on the toolbar, window placement, theme chrome |
+| `MainWindow.xaml(.cs)` | Toolbar (version, Open, Reload, Remote, theme, ⋯ menu with Print, Export, Copy Markdown, the print-theme choice and update options), Ctrl+P, Ctrl+Shift+C, remote-content bar, update bar, WebView2 setup (crash reports kept local) and the notice when it can't start, drag and drop on the toolbar, window placement, theme chrome |
 | `AssemblyInfo.cs` | WPF theme info; internals visible to `MDGlint.Desktop.Tests` |
 | `Services/PreviewHost.cs` | Applies `PreviewPolicy` to WebView2: shell page, local file responses, remote-content blocking, render/theme messages (with the print theme), printing and PDF export, files dropped on the preview, the no-file page's Open request, navigation and links; SmartScreen off |
 | `Services/FileMarkdownReader.cs` | `IMarkdownFileReader` over the file system |
@@ -100,9 +100,9 @@ Where things live. Keep this current when files are added, moved, or removed.
 | `Helpers/ProcessLauncher.cs` | Starts every program MDGlint opens (browser, Explorer, setup); the Debug launch log |
 | `Helpers/PreviewProcess.cs` | Recognises MDGlint's WebView2 browser process by its command line, and whether its window is gone |
 | `Helpers/WindowPlacement.cs` | Where the window opens (maximized by default, else its saved bounds fitted to the screen) and what it saves on closing |
-| `Assets/index.html` | Preview shell page: CSP, `<base>`, stylesheet links, scripts, the no-file page's Open prompt |
-| `Assets/preview.js` | The page's decisions, tested in Node: messages, theme URLs, absolute-path rewriting, scroll anchoring, code highlighting, `#anchor` targets, file drags |
-| `Assets/app.js` | Wires `preview.js` to the page: render in place, scroll, theme swap, `#anchor` clicks, dropped files to the app, the Open prompt on the no-file page, the ready message |
+| `Assets/index.html` | Preview shell page: CSP, `<base>`, stylesheet links, scripts, the no-file page's Open prompt, the code blocks' Copy button |
+| `Assets/preview.js` | The page's decisions, tested in Node: messages, theme URLs, absolute-path rewriting, scroll anchoring, code highlighting, the text a Copy button copies and its label, `#anchor` targets, file drags |
+| `Assets/app.js` | Wires `preview.js` to the page: render in place, scroll, theme swap, `#anchor` clicks, dropped files to the app, the Open prompt on the no-file page, Copy buttons on code blocks, the ready message |
 | `Assets/app.css` | Page layout around the Markdown, colour scheme, code-block fixes, print rules (MDGlint's footer with the page number, no browser header or footer) |
 | `Assets/vendor/github-markdown-css/` | GitHub's Markdown styles, light and dark (MIT, with licence) |
 | `Assets/vendor/highlight.js/` | highlight.js common build, extra languages in `languages/`, GitHub themes (BSD-3, with licence) |
@@ -130,6 +130,7 @@ Where things live. Keep this current when files are added, moved, or removed.
 | `DevTools.cs` | DevTools protocol client for the preview page |
 | `LocalServer.cs` | HTTP server on 127.0.0.1 standing in for remote hosts and GitHub |
 | `PreviewTests.cs` | Scripts blocked, local images and refused files, links, files dropped on the preview, the no-file page's Open button, `#` jumps, keeping the reader's place |
-| `PrintTests.cs` | The light print theme and turning it off, PDF export beside the file and its title, MDGlint's footer on every page and no browser header or footer, Print and Export only with a file open |
+| `PrintTests.cs` | The light print theme and turning it off, PDF export beside the file and its title, MDGlint's footer on every page and no browser header or footer, Print, Export and Copy Markdown only with a file open |
+| `CopyTests.cs` | A code block's Copy button, Copy Markdown |
 | `WindowTests.cs` | Theme, remote content, opening maximized and where it was left, the WebView2-missing notice, ending a leftover preview process |
 | `UpdateFlowTests.cs` | Opt-in respected, install only on request, hash mismatch, the ⋯ menu |
