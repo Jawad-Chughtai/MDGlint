@@ -330,7 +330,9 @@
   installing in the background (the user should choose when the app
   closes) and notify-only (users would have to download and run setup by
   hand). The hash proves the file is the one the release published, not
-  who published it; code signing (issue #36) would add that.
+  who published it; code signing (issue #36) would add that. *(Extended
+  2026-11-22 by "Beta versions are opt-in" under Packaging and
+  distribution.)*
 - **2026-11-19: Uninstall asks whether to keep settings.** As most apps
   do, the uninstaller asks whether to keep the settings (Yes is the
   default); **No** removes `%APPDATA%\MDGlint` and
@@ -357,7 +359,22 @@
   it in between. The only thing requests say about the user's copy is
   the user agent, `MDGlint/<version>`. Debug builds can redirect update requests to a local server
   (`MDGLINT_DEBUG_UPDATE_SERVER`) for testing; Release builds don't
-  contain that code.
+  contain that code. *(Extended 2026-11-22 by "Beta versions are opt-in"
+  below.)*
+- **2026-11-22: Beta versions are opt-in (#48).** **Get beta versions** in
+  the **⋯** menu, off by default and for older settings files, lets testers
+  get pre-releases. With it on, the check reads the ten newest releases
+  (`releases?per_page=10`, since `releases/latest` skips pre-releases) and
+  offers the highest version among them, beta or stable. Ten is enough
+  because releases come newest first and a beta is always of a newer
+  version than the stable releases before it. Betas get the same rules:
+  drafts and anything outside this repository are ignored, the SHA-256
+  must match, and nothing installs until **Install**. Only a newer version
+  is ever offered, so turning it off while on a beta waits for the next
+  stable version rather than downgrading. It is part of the update check,
+  so it does nothing unless checks are on or the user asks. Copies before
+  1.1 can't see betas. Rejected: a separate beta channel or feed, which
+  would need more release tooling for the same result.
 - **2026-11-19: Updates keep working.** Every released version can install
   the latest release, so five rules hold for every release
   (`releasing.md`, "Keeping updates working"): never change the `AppId`;

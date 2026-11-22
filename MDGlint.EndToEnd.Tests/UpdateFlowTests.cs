@@ -178,7 +178,41 @@ public sealed class UpdateFlowTests
         await AppSession.WaitUntilAsync(() => WindowTests.Settings(app).GetProperty("CheckForUpdates").GetBoolean(), "The choice wasn't saved.");
     }
 
-    private static string LatestReleaseApi => "/" + UpdateSource.LatestReleaseApi.Host + UpdateSource.LatestReleaseApi.AbsolutePath;
+    [EndToEndFact]
+    public async Task OffersBetasOnlyWhenTurnedOn()
+    {
+        const string beta = NewVersion + "-beta.1";
+        using var github = FakeGitHub(CurrentVersion(), Hash(Setup), beta: beta);
+        var today = JsonSerializer.Serialize(DateTimeOffset.UtcNow.AddHours(-1));
+
+        await using var app = await AppSession.StartAsync(null, new AppOptions
+        {
+            UpdateServer = github.Origin,
+            Settings = $$"""{"CheckForUpdates":true,"LastUpdateCheck":{{today}}}""",
+        });
+
+        // Off by default: the stable check finds nothing new.
+        var betas = await app.MenuItemAsync("Get beta versions");
+        Assert.Equal(ToggleState.Off, ((TogglePattern)betas.GetCurrentPattern(TogglePattern.Pattern)).Current.ToggleState);
+        ((InvokePattern)(await app.MenuItemAsync("Check for updates now")).GetCurrentPattern(InvokePattern.Pattern)).Invoke();
+        await app.WaitForTextAsync("UpdateBarText", t => t.Contains("latest version"));
+
+        // Turned on, it checks at once and offers the beta, installable like any update.
+        ((InvokePattern)(await app.MenuItemAsync("Get beta versions")).GetCurrentPattern(InvokePattern.Pattern)).Invoke();
+        Assert.Equal($"MDGlint {beta} is available (you have {CurrentVersion()}).",
+            await app.WaitForTextAsync("UpdateBarText", t => t.Contains("is available")));
+        Assert.NotNull(app.Find("UpdateInstallButton"));
+        Assert.Equal([LatestReleaseApi, ReleasesApi], github.Requests);
+        await AppSession.WaitUntilAsync(() => WindowTests.Settings(app).GetProperty("GetBetaVersions").GetBoolean(),
+            "The choice wasn't saved.");
+
+        // Turned off again, the beta is no longer offered.
+        ((InvokePattern)(await app.MenuItemAsync("Get beta versions")).GetCurrentPattern(InvokePattern.Pattern)).Invoke();
+        await AppSession.WaitUntilAsync(() => app.Find("UpdateBarText") is null, "The beta was still offered.");
+        Assert.False(WindowTests.Settings(app).GetProperty("GetBetaVersions").GetBoolean());
+    }
+
+    private static string LatestReleaseApi =>"/" + UpdateSource.LatestReleaseApi.Host + UpdateSource.LatestReleaseApi.AbsolutePath;
 
     /// <summary>The version the app reports: the build's version without its commit.</summary>
     private static string CurrentVersion() =>
@@ -186,8 +220,28 @@ public sealed class UpdateFlowTests
 
     private static string Hash(byte[] file) => Convert.ToHexString(SHA256.HashData(file)).ToLowerInvariant();
 
-    /// <summary>GitHub's latest-release API and the release's two files, at the paths the app asks for.</summary>
-    private static LocalServer FakeGitHub(string version, string hash, bool withHashFile = true)
+    private static string ReleasesApi => "/" + UpdateSource.ReleasesApi.Host + UpdateSource.ReleasesApi.PathAndQuery;
+
+    /// <summary>
+    /// GitHub's latest-release API and the release's two files, at the paths the app asks for;
+    /// with <paramref name="beta"/>, the releases list also has that pre-release, newest first.
+    /// </summary>
+    private static LocalServer FakeGitHub(string version, string hash, bool withHashFile = true, string? beta = null)
+    {
+        var download = $"{UpdateSource.DownloadPrefix}v{version}/";
+        var release = Release(version, prerelease: false, withHashFile);
+        var releases = beta is null ? new[] { release } : [Release(beta, prerelease: true, withHashFile), release];
+        var downloadPath = "/" + new Uri(download).Host + new Uri(download).AbsolutePath;
+
+        return new LocalServer(path =>
+            path == LatestReleaseApi ? new LocalServer.Response(200, "application/json", JsonSerializer.SerializeToUtf8Bytes(release))
+            : path == ReleasesApi ? new LocalServer.Response(200, "application/json", JsonSerializer.SerializeToUtf8Bytes(releases))
+            : path == downloadPath + UpdateSource.InstallerName ? new LocalServer.Response(200, "application/octet-stream", Setup)
+            : path == downloadPath + UpdateSource.HashName ? new LocalServer.Response(200, "text/plain", DevTools.Utf8($"{hash}  {UpdateSource.InstallerName}"))
+            : LocalServer.NotFound);
+    }
+
+    private static object Release(string version, bool prerelease, bool withHashFile)
     {
         var download = $"{UpdateSource.DownloadPrefix}v{version}/";
         var assets = new List<object>
@@ -199,20 +253,13 @@ public sealed class UpdateFlowTests
             assets.Add(new { name = UpdateSource.HashName, browser_download_url = download + UpdateSource.HashName, size = 100 });
         }
 
-        var release = JsonSerializer.SerializeToUtf8Bytes(new
+        return new
         {
             tag_name = $"v{version}",
             html_url = $"{UpdateSource.ReleasePagePrefix}tag/v{version}",
             draft = false,
-            prerelease = false,
+            prerelease,
             assets,
-        });
-        var downloadPath = "/" + new Uri(download).Host + new Uri(download).AbsolutePath;
-
-        return new LocalServer(path =>
-            path == LatestReleaseApi ? new LocalServer.Response(200, "application/json", release)
-            : path == downloadPath + UpdateSource.InstallerName ? new LocalServer.Response(200, "application/octet-stream", Setup)
-            : path == downloadPath + UpdateSource.HashName ? new LocalServer.Response(200, "text/plain", DevTools.Utf8($"{hash}  {UpdateSource.InstallerName}"))
-            : LocalServer.NotFound);
+        };
     }
 }

@@ -32,6 +32,9 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   only that leftover process and starts the preview.
 - After an update, MDGlint opens again with the file that was open (#16). This works for
   updates installed from this version on.
+- **Get beta versions** in the **⋯** menu, off by default: the update check also offers
+  pre-releases, whichever is newest, beta or stable, with the same SHA-256 check (#48).
+  Turning it off never downgrades.
 
 ## [1.0.0] - 2026-11-22
 

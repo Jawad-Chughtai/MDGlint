@@ -19,7 +19,7 @@ tag is pushed; the steps around it stay manual. Never publish a locally built in
 
 1. **Pick the version** using [Semantic Versioning](https://semver.org): patch for fixes, minor
    for features, major for breaking changes. A version with a suffix (`1.1.0-beta.1`) becomes a
-   pre-release.
+   pre-release, offered only to copies with **Get beta versions** on (1.1 and later).
 2. **Open a release PR** titled `Release vx.y.z` that:
    - sets `<Version>` in `Directory.Build.props`, the only place the version is set (the
      installer, the exe's file details and the toolbar all take it from there);
@@ -78,8 +78,8 @@ tag is pushed; the steps around it stay manual. Never publish a locally built in
 7. **Publish the draft**: add the showcase images to its notes, check the notes and the hash,
    verify the downloaded installer's attestation
    (`gh attestation verify MDGlintSetup.exe -R Jawad-Chughtai/MDGlint`), and publish it.
-   Publishing it is what offers it to every copy of MDGlint that checks for updates; a draft or
-   pre-release is never offered. A published release is immutable: its files and tag can't
+   Publishing it is what offers it to every copy of MDGlint that checks for updates; a draft is
+   never offered, and a pre-release only to copies that get beta versions. A published release is immutable: its files and tag can't
    change, so a mistake is fixed with a new version, and a version number is never reused.
 8. **Close the milestone.**
 

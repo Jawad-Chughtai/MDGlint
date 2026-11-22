@@ -76,9 +76,9 @@ Where things live. Keep this current when files are added, moved, or removed.
 | `SettingsFixtureTests.cs` | Every released version's `settings.json` still loads with its values |
 | `Fixtures/settings/` | `settings.json` as each release writes it, one file per version, never edited once released |
 | `ThemeServiceTests.cs` | Theme parsing and toggling |
-| `UpdateCoordinatorTests.cs` | The update bar's flow, with a fake store and server |
+| `UpdateCoordinatorTests.cs` | The update bar's flow and the beta choice, with a fake store and server |
 | `UpdatePreferenceTests.cs` | Opt-in rules and the once-a-day check |
-| `UpdateServiceTests.cs` | Release parsing, check results, download and hash checks (fake HTTP handler) |
+| `UpdateServiceTests.cs` | Release parsing, check results with and without betas, download and hash checks (fake HTTP handler) |
 
 ## MDGlint.Desktop (net10.0-windows, WPF)
 | Path | What |
@@ -142,4 +142,4 @@ Where things live. Keep this current when files are added, moved, or removed.
 | `CopyTests.cs` | A code block's Copy button, Copy Markdown |
 | `HtmlExportTests.cs` | Export ▸ HTML: one self-contained page, highlighted, remote images only once allowed |
 | `WindowTests.cs` | Theme, remote content, opening maximized and where it was left, the WebView2-missing notice, ending a leftover preview process |
-| `UpdateFlowTests.cs` | Opt-in respected, install only on request, reopening the file after an update, hash mismatch, the ⋯ menu |
+| `UpdateFlowTests.cs` | Opt-in respected, install only on request, reopening the file after an update, beta versions, hash mismatch, the ⋯ menu |

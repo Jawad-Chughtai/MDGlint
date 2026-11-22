@@ -143,6 +143,83 @@ public sealed class UpdateServiceTests : IDisposable
         Assert.Empty(_handler.Requests);
     }
 
+    [Fact]
+    public async Task CheckAsync_WithBetasOffersTheNewestReleaseBetaOrStable()
+    {
+        // Newest first by date, but the newest version wins: a 1.2.1 fix after the 1.3 beta.
+        _handler.Respond(UpdateSource.ReleasesApi.AbsoluteUri, Releases(
+            ReleaseJson("v1.2.1"),
+            ReleaseJson("v1.3.0-beta.2", preRelease: true),
+            ReleaseJson("v1.3.0-beta.1", preRelease: true),
+            ReleaseJson("v1.2.0")));
+
+        var result = await Service("1.2.0").CheckAsync(includeBetas: true);
+
+        Assert.Equal("1.3.0-beta.2", result.Update!.Version.ToString());
+        Assert.Equal(UpdateSource.ReleasesApi, Assert.Single(_handler.Requests).RequestUri);
+    }
+
+    [Fact]
+    public async Task CheckAsync_WithBetasOffersAStableReleaseNewerThanTheBeta()
+    {
+        _handler.Respond(UpdateSource.ReleasesApi.AbsoluteUri, Releases(
+            ReleaseJson("v1.3.0"),
+            ReleaseJson("v1.3.0-beta.2", preRelease: true)));
+
+        Assert.Equal("1.3.0", (await Service("1.3.0-beta.2").CheckAsync(includeBetas: true)).Update!.Version.ToString());
+    }
+
+    [Fact]
+    public async Task CheckAsync_WithBetasSkipsDraftsAndReleasesOutsideTheRepository()
+    {
+        _handler.Respond(UpdateSource.ReleasesApi.AbsoluteUri, Releases(
+            ReleaseJson("v2.0.0-beta.1", draft: true, preRelease: true),
+            ReleaseJson("v1.9.0-beta.1", preRelease: true, page: "https://example.com/v1.9.0-beta.1"),
+            ReleaseJson("latest"),
+            ReleaseJson("v1.1.0-beta.1", preRelease: true)));
+
+        Assert.Equal("1.1.0-beta.1", (await Service("1.0.0").CheckAsync(includeBetas: true)).Update!.Version.ToString());
+    }
+
+    [Theory]
+    [InlineData("[]")]
+    [InlineData(null)]
+    public async Task CheckAsync_WithBetasIsUpToDateWhenNothingIsNewer(string? json)
+    {
+        _handler.Respond(UpdateSource.ReleasesApi.AbsoluteUri, json ?? Releases(ReleaseJson("v1.0.0"), ReleaseJson("v1.0.0-beta.1", preRelease: true)));
+
+        Assert.Equal(UpdateCheckStatus.UpToDate, (await Service("1.0.0").CheckAsync(includeBetas: true)).Status);
+    }
+
+    [Fact]
+    public async Task CheckAsync_WithBetasNeverOffersAnOlderVersion()
+    {
+        // Turned off and on again while on a beta: the older stable isn't a downgrade target.
+        _handler.Respond(UpdateSource.ReleasesApi.AbsoluteUri, Releases(ReleaseJson("v1.2.0")));
+        _handler.Respond(UpdateSource.LatestReleaseApi.AbsoluteUri, ReleaseJson("v1.2.0"));
+
+        Assert.Equal(UpdateCheckStatus.UpToDate, (await Service("1.3.0-beta.1").CheckAsync(includeBetas: true)).Status);
+        Assert.Equal(UpdateCheckStatus.UpToDate, (await Service("1.3.0-beta.1").CheckAsync()).Status);
+    }
+
+    [Fact]
+    public async Task CheckAsync_WithBetasFailsOnAnAnswerThatIsNotAList()
+    {
+        _handler.Respond(UpdateSource.ReleasesApi.AbsoluteUri, ReleaseJson("v1.2.0"));
+
+        Assert.Equal(UpdateCheckStatus.Failed, (await Service("1.0.0").CheckAsync(includeBetas: true)).Status);
+    }
+
+    [Fact]
+    public void ParseNewestRelease_KeepsTheInstallRules()
+    {
+        // Same hash and asset rules as a stable release.
+        var update = UpdateService.ParseNewestRelease(Releases(
+            ReleaseJson("v1.3.0-beta.1", preRelease: true, assets: [Asset(UpdateSource.InstallerName)])));
+
+        Assert.False(update!.CanInstall);
+    }
+
     [Theory]
     [InlineData(true, false)]
     [InlineData(false, true)]
@@ -464,6 +541,9 @@ public sealed class UpdateServiceTests : IDisposable
 
         return JsonSerializer.Serialize(release);
     }
+
+    /// <summary>GitHub's list of releases, from <see cref="ReleaseJson"/>s.</summary>
+    internal static string Releases(params string[] releases) => "[" + string.Join(",", releases) + "]";
 
     internal static object Asset(string name, string? url = null, long? size = null) => new Dictionary<string, object>
     {

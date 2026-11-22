@@ -75,6 +75,31 @@ public sealed class UpdateCoordinator
         return CheckIfDueAsync();
     }
 
+    /// <summary>The "Get beta versions" choice.</summary>
+    public bool BetaVersions => _settings.GetBetaVersions;
+
+    /// <summary>
+    /// Saves the "Get beta versions" choice. Turning it on checks right away when checks are
+    /// on; turning it off takes back a beta the bar offers, unless it's downloading.
+    /// </summary>
+    public Task SetBetaVersionsAsync(bool enabled)
+    {
+        _settings.GetBetaVersions = enabled;
+        _store.Save(_settings);
+        if (enabled)
+        {
+            return AutomaticChecks ? CheckAsync(userAsked: false) : Task.CompletedTask;
+        }
+
+        if (!IsBusy && Update is { Version.IsPreRelease: true })
+        {
+            Update = null;
+            SetState(UpdateBarState.Hidden);
+        }
+
+        return Task.CompletedTask;
+    }
+
     /// <summary>The check MDGlint makes on its own: only when checks are on, at most once a day.</summary>
     public Task CheckIfDueAsync() =>
         UpdatePreference.IsCheckDue(_settings, _setupChoice, _now())
@@ -102,7 +127,7 @@ public sealed class UpdateCoordinator
         try
         {
             using var timeout = new CancellationTokenSource(CheckTimeout);
-            result = await _service.CheckAsync(timeout.Token);
+            result = await _service.CheckAsync(_settings.GetBetaVersions, timeout.Token);
         }
         catch (OperationCanceledException)
         {

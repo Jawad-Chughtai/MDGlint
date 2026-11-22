@@ -14,6 +14,12 @@ public static class UpdateSource
     /// <summary>GitHub's latest published release; drafts and pre-releases are never returned.</summary>
     public static Uri LatestReleaseApi { get; } = new($"https://api.github.com/repos/{Repository}/releases/latest");
 
+    /// <summary>
+    /// The newest published releases, pre-releases included, newest first: what the check reads
+    /// when the user gets beta versions. Drafts are only listed for the repository's maintainers.
+    /// </summary>
+    public static Uri ReleasesApi { get; } = new($"https://api.github.com/repos/{Repository}/releases?per_page=10");
+
     /// <summary>Release pages and downloads must be under these, or the release is ignored.</summary>
     public static string ReleasePagePrefix { get; } = $"https://github.com/{Repository}/releases/";
     public static string DownloadPrefix { get; } = $"https://github.com/{Repository}/releases/download/";

@@ -60,6 +60,12 @@ closes MDGlint, installs the update and opens MDGlint again; nothing is installe
 press it. You can update from any older version straight to the latest one. You can also
 download the latest installer yourself and run it over your installed copy.
 
+To test new versions early, turn on **Get beta versions** in the **⋯** menu. The check then
+also offers pre-releases (`1.2.0-beta.1`), whichever is newest, beta or stable, with the same
+SHA-256 check. Turning it off never goes back to an older version: you stay on the beta until
+a newer stable version is out. Versions before 1.1 can't see betas, so download the first one
+yourself from the [releases page](https://github.com/Jawad-Chughtai/MDGlint/releases).
+
 > **Windows SmartScreen:** the installer is not code-signed yet, so Windows may show
 > "Windows protected your PC". Choose **More info**, then **Run anyway**. You can check the
 > download against the SHA-256 hash published on the release page, or, with the

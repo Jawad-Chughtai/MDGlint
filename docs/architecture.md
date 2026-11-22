@@ -181,7 +181,11 @@ state and forwards the clicks.
 
 `UpdateService` (Core, given an `HttpClient`) asks `api.github.com` for the repository's latest
 release and compares its tag with the running version (`SemanticVersion`). It ignores drafts,
-pre-releases and anything not under this repository's release URLs, and offers the installer
+pre-releases and anything not under this repository's release URLs. With **Get beta versions**
+on (`GetBetaVersions` in settings, off by default), it reads the ten newest releases instead
+(`releases?per_page=10`) and takes the highest version among them, pre-releases included;
+turning it on checks at once when checks are on, and turning it off hides a beta the bar
+offers. Either way only a newer version is offered, so nothing is downgraded. It offers the installer
 only when the release has both `MDGlintSetup.exe` and `MDGlintSetup.exe.sha256` (names in
 `UpdateSource`); otherwise the bar only links to the release page. **Install** downloads the
 `.sha256` file and then the installer into `%LOCALAPPDATA%\MDGlint\Updates\`, checking the size

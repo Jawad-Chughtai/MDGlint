@@ -38,6 +38,7 @@ public sealed class AppSettingsTests
         Assert.False(settings.AllowRemoteContent);
         Assert.True(settings.PrintInLightTheme);
         Assert.Null(settings.CheckForUpdates);
+        Assert.False(settings.GetBetaVersions);
     }
 
     [Fact]
@@ -47,6 +48,7 @@ public sealed class AppSettingsTests
 
         Assert.Equal("dark", settings.Theme);
         Assert.True(settings.PrintInLightTheme);
+        Assert.False(settings.GetBetaVersions); // Nor betas, for files written before 1.1.
     }
 
     [Fact]

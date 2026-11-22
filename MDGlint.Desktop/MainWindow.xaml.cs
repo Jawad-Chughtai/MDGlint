@@ -308,6 +308,7 @@ public partial class MainWindow : Window
         CopyMarkdownMenuItem.IsEnabled = FileShown;
         PrintLightMenuItem.IsChecked = _settings.PrintInLightTheme;
         AutoUpdateMenuItem.IsChecked = _updates.AutomaticChecks;
+        BetaMenuItem.IsChecked = _updates.BetaVersions;
         CheckNowMenuItem.IsEnabled = !_updates.IsBusy;
         var menu = MoreButton.ContextMenu;
         menu.PlacementTarget = MoreButton;
@@ -471,6 +472,11 @@ public partial class MainWindow : Window
     private void AutoUpdateMenuItem_Click(object sender, RoutedEventArgs e)
     {
         _ = _updates.SetAutomaticChecksAsync(AutoUpdateMenuItem.IsChecked);
+    }
+
+    private void BetaMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        _ = _updates.SetBetaVersionsAsync(BetaMenuItem.IsChecked);
     }
 
     private void CheckNowMenuItem_Click(object sender, RoutedEventArgs e)
