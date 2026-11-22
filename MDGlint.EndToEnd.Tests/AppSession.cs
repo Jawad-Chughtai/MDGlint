@@ -258,6 +258,13 @@ internal sealed class AppSession : IAsyncDisposable
         }
     }
 
+    /// <summary>A window of the app's other than its main one, such as a dialog, by its title.</summary>
+    public AutomationElement? FindWindow(string name) =>
+        AutomationElement.RootElement.FindFirst(TreeScope.Descendants, new AndCondition(
+            new PropertyCondition(AutomationElement.ProcessIdProperty, Process.Id),
+            new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Window),
+            new PropertyCondition(AutomationElement.NameProperty, name)));
+
     /// <summary>Opens the ⋯ menu and returns one of its items (the menu is a window of its own).</summary>
     public async Task<AutomationElement> MenuItemAsync(string name)
     {

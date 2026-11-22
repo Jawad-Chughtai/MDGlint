@@ -82,6 +82,13 @@ later (see `decisions.md`).
    (`postMessageWithAdditionalObjects`); `PreviewHost` reads their paths and opens the first
    Markdown file (`PreviewPolicy.DroppedMarkdownFile`, which the toolbar drop uses too). Only a
    real drop carries a path, so a page can't name a file for the app to open.
+9. **Open on the no-file page.** With no file open, `MarkdownRenderer` marks its message
+   `OffersOpen`, and the render message says so. `app.js` then adds the shell's own prompt (a
+   `<template>` in `index.html`: an **Open…** button and a line about dropping a file) below the
+   message. Clicking it posts `{ type: "open" }`. `PreviewHost` raises `OpenRequested` only
+   while the no-file page is shown, and the window opens the same dialog as the toolbar's
+   **Open**. The page can only ask for the dialog: the user picks the file. The sanitizer
+   removes buttons from files, so a file can't add one of its own.
 
 ## Themes
 

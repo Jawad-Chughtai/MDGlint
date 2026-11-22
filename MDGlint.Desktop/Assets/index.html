@@ -26,5 +26,15 @@
 </head>
 <body hidden>
   <main id="mdglint-content" class="markdown-body"></main>
+  <!--
+    Added below the no-file message by app.js. It is part of the shell, not the rendered content,
+    so no Markdown file can show it or click it.
+  -->
+  <template id="mdglint-open-prompt">
+    <div class="open-prompt">
+      <button type="button">Open…</button>
+      <p class="message">Or drop a Markdown file here.</p>
+    </div>
+  </template>
 </body>
 </html>

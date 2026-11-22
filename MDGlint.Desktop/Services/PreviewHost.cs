@@ -20,6 +20,7 @@ public sealed class PreviewHost
     private readonly Action<string> _openMarkdownFile;
     private bool _isReady;
     private bool _blockedReported;
+    private bool _offersOpen;
 
     private PreviewHost(CoreWebView2 core, Action<string> openMarkdownFile)
     {
@@ -35,6 +36,12 @@ public sealed class PreviewHost
     /// blocked because <see cref="AllowRemoteContent"/> is false.
     /// </summary>
     public event EventHandler? RemoteContentBlocked;
+
+    /// <summary>
+    /// Raised when the user clicks <b>Open…</b> on the no-file page. Ignored while any other page
+    /// is shown, so a document can never ask for the dialog.
+    /// </summary>
+    public event EventHandler? OpenRequested;
 
     /// <summary>
     /// Whether the document being shown may load images, video and audio from the internet. Set
@@ -93,13 +100,15 @@ public sealed class PreviewHost
         }
 
         _blockedReported = false;
+        _offersOpen = document.OffersOpen;
         Post(new
         {
             type = "render",
             html = document.Html,
             @base = document.BaseDirectory is null ? null : DocumentUrls.ToFolderUrl(document.BaseDirectory),
             theme = theme.ToStorageValue(),
-            resetScroll = isNewDocument
+            resetScroll = isNewDocument,
+            offersOpen = document.OffersOpen
         });
     }
 
@@ -199,6 +208,10 @@ public sealed class PreviewHost
             {
                 _openMarkdownFile(dropped);
             }
+        }
+        else if (PreviewPolicy.IsOpenMessage(e.WebMessageAsJson) && _offersOpen)
+        {
+            OpenRequested?.Invoke(this, EventArgs.Empty);
         }
     }
 

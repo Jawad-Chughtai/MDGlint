@@ -1,3 +1,5 @@
+using System.Windows.Automation;
+
 namespace MDGlint.EndToEnd.Tests;
 
 /// <summary>What the preview shows, loads and refuses, in the real WebView2.</summary>
@@ -150,6 +152,37 @@ public sealed class PreviewTests : IDisposable
         await page.DropFilesAsync(image, dropped, file);
         await page.WaitForAsync("document.querySelector('h1')?.textContent === 'Dropped file'");
         Assert.Empty(app.Launches());
+    }
+
+    [EndToEndFact]
+    public async Task OffersOpenOnlyWhenNoFileIsOpen()
+    {
+        const string Dialog = "Open Markdown File";
+
+        // With a file open there is no prompt, and a file can't add a button of its own.
+        var file = Write("notes.md", """
+            # Notes
+
+            <div class="open-prompt"><button type="button">Open…</button></div>
+            """);
+        await using (var withFile = await AppSession.StartAsync(file))
+        {
+            await withFile.Page.WaitForAsync("document.querySelector('h1')?.textContent === 'Notes'");
+            Assert.Equal(0, await withFile.Page.EvaluateAsync<int>("document.querySelectorAll('#mdglint-content button').length"));
+        }
+
+        await using var app = await AppSession.StartAsync(null);
+        var page = app.Page;
+        await page.WaitForAsync("document.querySelector('#mdglint-content .open-prompt button') !== null");
+        Assert.Equal("Open a Markdown file to preview it.", await page.EvaluateAsync<string>(
+            "document.querySelector('#mdglint-content > p.message').textContent"));
+        Assert.Equal("Or drop a Markdown file here.", await page.EvaluateAsync<string>(
+            "document.querySelector('#mdglint-content .open-prompt .message').textContent"));
+
+        await page.ClickAsync("#mdglint-content .open-prompt button");
+        await AppSession.WaitUntilAsync(() => app.FindWindow(Dialog) is not null, "The Open dialog didn't appear.");
+        ((WindowPattern)app.FindWindow(Dialog)!.GetCurrentPattern(WindowPattern.Pattern)).Close();
+        await AppSession.WaitUntilAsync(() => app.FindWindow(Dialog) is null, "The Open dialog didn't close.");
     }
 
     [EndToEndFact]
