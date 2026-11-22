@@ -110,7 +110,9 @@ to switch stylesheets: the github-markdown-css and highlight.js theme for the ne
 **Print…** (⋯ menu or Ctrl+P) opens WebView2's print dialog, with a preview
 (`ShowPrintUI(CoreWebView2PrintDialogKind.Browser)`). The system dialog can't preview a WebView2
 page, and it could leave the browser process running after the window closed. The page title is
-the file's name (the render message's `title`), so a PDF is titled with it. **Export ▸ PDF…**
+the file's name (the render message's `title`), so a PDF is titled with it. The dialog's header
+and footer stay off the page: `app.css` puts an empty `@page` margin box in each of their six
+places, and Chromium leaves out its own text wherever a page fills one. **Export ▸ PDF…**
 saves the file with WebView2's `PrintToPdfAsync` beside the open file by default
 (`ExportFiles`), with backgrounds and no browser header or footer. Both print the page as it is
 shown, so a PDF has the same images, and the same remote-content choice, as the preview. Both

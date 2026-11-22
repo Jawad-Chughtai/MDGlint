@@ -134,6 +134,54 @@ public sealed class PrintTests : IDisposable
     }
 
     [EndToEndFact]
+    public async Task LeavesOutTheBrowsersHeaderAndFooter()
+    {
+        await using var app = await AppSession.StartAsync(Write("notes.md", "# Notes\n\nSome text."));
+        var page = app.Page;
+        await page.WaitForAsync("document.querySelector('h1')?.textContent === 'Notes'");
+
+        // With the header and footer asked for, the page prints no more text than without:
+        // no date, title, address or page number.
+        var plain = await PrintedTextRuns(page, headerAndFooter: false);
+        Assert.True(plain > 0, "Nothing was printed.");
+        Assert.Equal(plain, await PrintedTextRuns(page, headerAndFooter: true));
+    }
+
+    /// <summary>How many runs of text the page prints, counted in the PDF's content streams.</summary>
+    private static async Task<int> PrintedTextRuns(DevTools page, bool headerAndFooter)
+    {
+        var result = await page.SendAsync("Page.printToPDF", new { displayHeaderFooter = headerAndFooter });
+        var pdf = Convert.FromBase64String(result.GetProperty("data").GetString()!);
+        var text = System.Text.Encoding.Latin1.GetString(pdf);
+        var runs = 0;
+        foreach (System.Text.RegularExpressions.Match stream in System.Text.RegularExpressions.Regex.Matches(text, @"(?<!end)stream\r?\n"))
+        {
+            var start = stream.Index + stream.Length;
+            var end = text.IndexOf("endstream", start, StringComparison.Ordinal);
+            if (end < 0)
+            {
+                continue;
+            }
+
+            try
+            {
+                using var inflate = new System.IO.Compression.ZLibStream(
+                    new MemoryStream(pdf, start, end - start), System.IO.Compression.CompressionMode.Decompress);
+                using var content = new MemoryStream();
+                inflate.CopyTo(content);
+                runs += System.Text.RegularExpressions.Regex.Matches(
+                    System.Text.Encoding.Latin1.GetString(content.ToArray()), @"\bT[jJ]\b").Count;
+            }
+            catch (InvalidDataException)
+            {
+                // Not a compressed stream (an image or font, say).
+            }
+        }
+
+        return runs;
+    }
+
+    [EndToEndFact]
     public async Task OffersPrintAndExportOnlyForAFile()
     {
         await using var app = await AppSession.StartAsync(null);
